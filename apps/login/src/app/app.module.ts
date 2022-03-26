@@ -1,20 +1,11 @@
 import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
-import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AppRoutingModule } from './app-routing.module';
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [
-    CommonModule,
-    RouterModule.forChild([
-      {
-        path: '',
-        component: AppComponent,
-      },
-    ]),
-  ],
-  providers: [],
+  imports: [CommonModule, AppRoutingModule],
 })
 export class AppModule {}
