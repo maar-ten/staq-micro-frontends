@@ -1,6 +1,7 @@
 {
   "version": 2,
   "projects": {
+    "dashboard": "apps/dashboard",
     "login": "apps/login",
     "shell": "apps/shell"
   }
