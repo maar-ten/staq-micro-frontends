@@ -3,6 +3,8 @@
   "projects": {
     "component-library": "libs/component-library",
     "dashboard": "apps/dashboard",
+    "flights": "apps/flights",
+    "flights-e2e": "apps/flights-e2e",
     "login": "apps/login",
     "shell": "apps/shell"
   }
