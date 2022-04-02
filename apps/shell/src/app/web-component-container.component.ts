@@ -17,6 +17,6 @@ export class WebComponentContainerComponent implements OnInit {
     await loadElement();
 
     const element = document.createElement(elementName);
-    this.container.nativeElement.appendChild(element);
+    this.container.nativeElement?.appendChild(element);
   }
 }

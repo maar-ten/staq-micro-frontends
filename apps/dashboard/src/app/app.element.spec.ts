@@ -1,10 +1,10 @@
-import { AppElement } from './app.element';
+import { MFEDashboardElement } from './app.element';
 
 describe('AppElement', () => {
-  let app: AppElement;
+  let app: MFEDashboardElement;
 
   beforeEach(() => {
-    app = new AppElement();
+    app = new MFEDashboardElement();
   });
 
   it('should create successfully', () => {
@@ -14,6 +14,6 @@ describe('AppElement', () => {
   it('should have a greeting', () => {
     app.connectedCallback();
 
-    expect(app.querySelector('h1').innerHTML).toContain('Welcome dashboard');
+    expect(app.querySelector('p').innerHTML).toContain('dashboard works!');
   });
 });

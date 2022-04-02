@@ -1,12 +1,18 @@
-import './app.element.scss';
+import { LitElement, html } from 'lit';
 
-export class AppElement extends HTMLElement {
-  public static observedAttributes = [];
+export class MFEDashboardElement extends LitElement {
+  static properties = {
+    count: { type: Number },
+  };
 
-  connectedCallback() {
-    this.innerHTML = `
-   <p>dashboard works!</p>
-      `;
+  count = 0;
+
+  protected render() {
+    return html` <p>Dashboard works!</p> `;
+  }
+  private _increment() {
+    this.count++;
   }
 }
-customElements.define('mfe-dashboard', AppElement);
+
+customElements.define('mfe-dashboard', MFEDashboardElement);

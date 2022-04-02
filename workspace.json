@@ -1,6 +1,7 @@
 {
   "version": 2,
   "projects": {
+    "component-library": "libs/component-library",
     "dashboard": "apps/dashboard",
     "login": "apps/login",
     "shell": "apps/shell"
