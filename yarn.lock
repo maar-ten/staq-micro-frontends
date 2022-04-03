@@ -3008,6 +3008,11 @@
     "@types/history" "^4.7.11"
     "@types/react" "*"
 
+"@types/react-shadow-dom-retarget-events@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/react-shadow-dom-retarget-events/-/react-shadow-dom-retarget-events-1.0.0.tgz#dabd1d467826f7988604d3c6e80bee02e1d17ef0"
+  integrity sha512-IVeyB+jl4l0j3QQxyouIMLc7T+6OqyYUKhaa2djyxrFJrL3BtEUhn2n5+IeRpvv1pwUl9yTUEyCeA98Gy2sexg==
+
 "@types/react-test-renderer@>=16.9.0":
   version "17.0.1"
   resolved "https://registry.yarnpkg.com/@types/react-test-renderer/-/react-test-renderer-17.0.1.tgz#3120f7d1c157fba9df0118dae20cb0297ee0e06b"
@@ -10111,6 +10116,11 @@ react-router@5.2.1:
     react-is "^16.6.0"
     tiny-invariant "^1.0.2"
     tiny-warning "^1.0.0"
+
+react-shadow-dom-retarget-events@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-shadow-dom-retarget-events/-/react-shadow-dom-retarget-events-1.1.0.tgz#ffe3a9dc4e6287b5239e863d0e5f1e392de0410a"
+  integrity sha512-hI/naZ8fUARf5He4PpvQtqhs/VWoocfg3ULeCOE3ccWiXGEsFpshlx2iB1XNtm2SFDdvZYoSo25a8JViYdAcgQ==
 
 react-shallow-renderer@^16.13.1:
   version "16.14.1"

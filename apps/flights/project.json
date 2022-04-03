@@ -12,13 +12,13 @@
         "outputPath": "dist/apps/flights",
         "index": "apps/flights/src/index.html",
         "baseHref": "/",
-        "main": "apps/flights/src/main.tsx",
+        "main": "apps/flights/src/index.ts",
         "polyfills": "apps/flights/src/polyfills.ts",
         "tsConfig": "apps/flights/tsconfig.app.json",
         "assets": ["apps/flights/src/favicon.ico", "apps/flights/src/assets"],
         "styles": ["apps/flights/src/styles.scss"],
         "scripts": [],
-        "webpackConfig": "@nrwl/react/plugins/webpack"
+        "webpackConfig": "apps/flights/webpack.config.js"
       },
       "configurations": {
         "production": {
@@ -41,7 +41,8 @@
       "executor": "@nrwl/web:dev-server",
       "options": {
         "buildTarget": "flights:build",
-        "hmr": true
+        "hmr": true,
+        "port": 4203
       },
       "configurations": {
         "production": {

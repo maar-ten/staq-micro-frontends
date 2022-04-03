@@ -1,2 +1,14 @@
-<p>login works!</p>
-<router-outlet></router-outlet>
+<h2>Login</h2>
+<form>
+  <div>User Name:</div>
+  <div><input name="userName" [(ngModel)]="userName" /><br /></div>
+  <div>Password:</div>
+  <div>
+    <input name="userName" type="password" [(ngModel)]="password" /><br />
+  </div>
+
+  <div>
+    <button (click)="login()">Login</button>
+    <button (click)="logout()">Logout</button>
+  </div>
+</form>

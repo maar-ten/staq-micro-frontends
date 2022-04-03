@@ -47,6 +47,7 @@ module.exports = {
       remotes: {
         login: 'http://localhost:4201/remoteEntry.js',
         dashboard: 'http://localhost:4202/remoteEntry.js',
+        flights: 'http://localhost:4203/remoteEntry.js',
       },
       shared: share({
         '@angular/core': {
@@ -68,6 +69,18 @@ module.exports = {
           includeSecondaries: true,
         },
         '@angular/router': {
+          singleton: true,
+          strictVersion: true,
+          requiredVersion: 'auto',
+          includeSecondaries: true,
+        },
+        react: {
+          singleton: true,
+          strictVersion: true,
+          requiredVersion: 'auto',
+          includeSecondaries: true,
+        },
+        'react-dom': {
           singleton: true,
           strictVersion: true,
           requiredVersion: 'auto',

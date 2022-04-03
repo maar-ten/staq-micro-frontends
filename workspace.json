@@ -1,10 +1,9 @@
 {
   "version": 2,
   "projects": {
-    "component-library": "libs/component-library",
+    "auth": "libs/auth",
     "dashboard": "apps/dashboard",
     "flights": "apps/flights",
-    "flights-e2e": "apps/flights-e2e",
     "login": "apps/login",
     "shell": "apps/shell"
   }

@@ -8,10 +8,21 @@ export class MFEDashboardElement extends LitElement {
   count = 0;
 
   protected render() {
-    return html` <p>Dashboard works!</p> `;
+    const user = sessionStorage.getItem('loggedIn');
+
+    if (user) {
+      return html`
+        <p>Welcome ${user}</p>
+        <button @click=${this.logout}>Logout</button>
+      `;
+    }
+
+    return html`<span>Welcome, please login <a href="/login">here</a>.</span>`;
   }
-  private _increment() {
-    this.count++;
+
+  private logout() {
+    sessionStorage.removeItem('loggedIn');
+    window.location.assign('/dashboard');
   }
 }
 

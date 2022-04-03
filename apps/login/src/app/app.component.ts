@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '@mfe/auth';
 
 @Component({
   selector: 'mfe-root',
@@ -6,5 +8,21 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  title = 'login';
+  constructor(
+    private readonly authService: AuthService,
+    private readonly router: Router
+  ) {}
+
+  userName = '';
+  password = '';
+
+  login(): void {
+    this.authService.login(this.userName, this.password);
+    this.router.navigateByUrl('/dashboard');
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigateByUrl('/dashboard');
+  }
 }
