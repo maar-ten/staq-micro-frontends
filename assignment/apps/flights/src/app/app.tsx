@@ -3,6 +3,7 @@ import styles from './app.module.scss';
 import { BrowserRouter } from 'react-router-dom';
 
 import { Route, Link } from 'react-router-dom';
+import { useState } from 'react';
 
 export function Home() {
   return (
@@ -17,6 +18,13 @@ export function Home() {
 }
 
 export function Search() {
+  const [state, setState] = useState<{ date: string }[]>([]);
+  const getFlights = () => {
+    fetch('api/flights')
+      .then((res) => res.json())
+      .then((flights) => setState(flights));
+  };
+
   return (
     <div id="container">
       <h1>Flights</h1>
@@ -25,8 +33,18 @@ export function Search() {
         <input className={styles['input']} type="text" placeholder="To" />
       </div>
       <div>
-        <button className={styles['button']}>Search</button>
+        <button onClick={() => getFlights()} className={styles['button']}>
+          Search
+        </button>
       </div>
+
+      {state.length > 0 && (
+        <ul>
+          {state.map((s) => (
+            <li>{s.date}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
