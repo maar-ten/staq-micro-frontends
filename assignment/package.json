@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "start": "nx serve",
-    "start:all": "nx run-many --target serve --all --parallel 5",
+    "start:all": "nx run-many --target serve --all --parallel 6",
     "build": "nx build",
     "test": "nx test",
     "postinstall": "ngcc --properties es2015 browser module main"
@@ -50,6 +50,7 @@
     "@nrwl/cypress": "13.9.5",
     "@nrwl/eslint-plugin-nx": "13.9.5",
     "@nrwl/jest": "13.9.5",
+    "@nrwl/js": "^13.9.6",
     "@nrwl/linter": "13.9.5",
     "@nrwl/nest": "^13.9.6",
     "@nrwl/node": "13.9.6",

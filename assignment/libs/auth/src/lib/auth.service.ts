@@ -1,25 +1,23 @@
 import { Injectable } from '@angular/core';
+import { authService } from '@mfe/auth-core';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private _userName?: string;
-  private _password?: string;
-
   public get userName() {
-    return this._userName;
+    return authService.getUserName();
   }
 
-  login(userName: string, password: string): void {
-    sessionStorage.setItem('loggedIn', userName);
+  login(userName: string, password: string) {
+    return authService.login(userName, password);
   }
 
   logout(): void {
-    sessionStorage.removeItem('loggedIn');
+    return authService.logout();
   }
 
   isLoggedIn() {
-    return sessionStorage.getItem('loggedIn') != null;
+    return authService.isLoggedIn();
   }
 }

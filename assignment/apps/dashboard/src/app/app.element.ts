@@ -1,4 +1,5 @@
 import { LitElement, html } from 'lit';
+import { authService } from '@mfe/auth-core';
 
 export class MFEDashboardElement extends LitElement {
   static properties = {
@@ -8,9 +9,10 @@ export class MFEDashboardElement extends LitElement {
   count = 0;
 
   protected render() {
-    const user = sessionStorage.getItem('loggedIn');
+    const isLoggedIn = authService.isLoggedIn();
+    const user = authService.getUserName();
 
-    if (user) {
+    if (isLoggedIn) {
       return html`
         <p>Welcome ${user}</p>
         <button @click=${this.logout}>Logout</button>
@@ -21,7 +23,7 @@ export class MFEDashboardElement extends LitElement {
   }
 
   private logout() {
-    sessionStorage.removeItem('loggedIn');
+    authService.logout();
     window.location.assign('/dashboard');
   }
 }

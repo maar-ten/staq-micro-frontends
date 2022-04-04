@@ -2061,7 +2061,7 @@
     source-map-support "0.5.19"
     tree-kill "1.2.2"
 
-"@nrwl/js@13.9.6":
+"@nrwl/js@13.9.6", "@nrwl/js@^13.9.6":
   version "13.9.6"
   resolved "https://registry.yarnpkg.com/@nrwl/js/-/js-13.9.6.tgz#65ac37d370ec27fb4776155bc952beaf8f9492bb"
   integrity sha512-bg8Bl5KXsVUUwT+h9ctI8Z82r+7eliNzEd+9c+d/5/V3kgt3mI5RwPeJywqEQwTB3AC2Lmz0mXFQz6quWxEx0A==
