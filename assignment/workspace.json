@@ -4,6 +4,7 @@
     "auth": "libs/auth",
     "dashboard": "apps/dashboard",
     "flights": "apps/flights",
+    "flights-backend": "apps/flights-backend",
     "login": "apps/login",
     "shell": "apps/shell"
   }
