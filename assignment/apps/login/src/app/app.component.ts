@@ -16,13 +16,13 @@ export class AppComponent {
   userName = '';
   password = '';
 
-  login(): void {
-    this.authService.login(this.userName, this.password);
-    this.router.navigateByUrl('/dashboard');
+  async login() {
+    await this.authService.login(this.userName, this.password);
+    this.router.navigateByUrl('/');
   }
 
   logout(): void {
     this.authService.logout();
-    this.router.navigateByUrl('/dashboard');
+    this.router.navigateByUrl('/');
   }
 }

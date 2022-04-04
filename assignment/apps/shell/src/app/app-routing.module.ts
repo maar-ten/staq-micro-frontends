@@ -11,19 +11,6 @@ const routes: Routes = [
     loadChildren: () => import('login/Module').then((m) => m.AppModule),
   },
   {
-    path: 'dashboard',
-    children: [
-      {
-        path: '**',
-        component: WebComponentContainerComponent,
-        data: {
-          loadElement: () => import('dashboard/Module'),
-          elementName: 'mfe-dashboard',
-        },
-      },
-    ],
-  },
-  {
     path: 'flights',
     canActivate: [AuthGuard],
     children: [
@@ -36,6 +23,14 @@ const routes: Routes = [
         },
       },
     ],
+  },
+  {
+    path: '**',
+    component: WebComponentContainerComponent,
+    data: {
+      loadElement: () => import('dashboard/Module'),
+      elementName: 'mfe-dashboard',
+    },
   },
 ];
 

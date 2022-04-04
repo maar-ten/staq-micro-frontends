@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@mfe/auth": ["libs/auth/src/index.ts"]
+      "@mfe/auth": ["libs/auth/src/index.ts"],
+      "@mfe/auth-core": ["libs/auth-core/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
