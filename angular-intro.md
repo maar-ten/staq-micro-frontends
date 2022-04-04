@@ -12,11 +12,13 @@ Angular is a development platform, built on [TypeScript](./typescript-intro.md).
 
 When you build applications with Angular, you're taking advantage of a platform that can scale from single-developer projects to enterprise-level applications. Angular is designed to make updating as easy as possible, so you can take advantage of the latest developments with a minimum of effort. Best of all, the Angular ecosystem consists of a diverse group of over 1.7 million developers, library authors, and content creators.
 
-Before you start exploring the Angular platform, you should know about the [Angular CLI](https://angular.io/cli). The Angular CLI is the fastest, easiest, and recommended way to develop Angular applications. The Angular CLI makes a number of tasks easy. In this workshop we use the [NX CLI](./nx-intro.md) which is an extension of the Angular CLI.
+Before you start exploring the Angular platform, you should know about the [Angular CLI](https://angular.io/cli). The Angular CLI is the fastest, easiest, and recommended way to develop Angular applications. The Angular CLI makes a number of tasks easy. In this workshop we use the [NX CLI](https://nx.dev/using-nx/nx-cli) which is an extension of the Angular CLI.
 
 You'll find the Angular CLI to be a valuable tool for building out your applications.
 
-## The structure of an Angular application
+## Angular concepts
+
+Here are a few Angular concepts you should be aware of:
 
 Components are the building blocks of an Angular application.
 A component includes a TypeScript class that has a `@Component()` decorator, an HTML template, and styles.
@@ -140,7 +142,7 @@ Typically, a component uses styles in a separate file using the `styleUrls` prop
 
 With component-specific styles, you can organize your CSS so that it is easily maintainable and portable.
 
-## What's next
+## Summary
 
 You've learned the basics about the main building blocks of an Angular application. The following diagram shows how these basic pieces are related.
 
@@ -151,7 +153,7 @@ You've learned the basics about the main building blocks of an Angular applicati
   - Directives and binding markup in a component's template modify views based on program data and logic.
 - The dependency injector provides services to a component, such as the router service that lets you define navigation among views.
 
-Each of these subjects is introduced in more detail in the following pages.
+If you want to read more about Angular, here are some useful links:
 
 - [Introduction to Modules](https://angular.io/guide/architecture-modules)
 - [Introduction to Components](https://angular.io/guide/architecture-components)

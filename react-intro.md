@@ -4,7 +4,7 @@ React is a JavaScript library built by Facebook. It is used for building front-e
 
 React has literally changed the way we think about web applications and user interface development and made it possible to build and manage large-scale web applications such as Facebook, Netflix and many more in a more-efficient and modular way.
 
-## How does it work?
+## React concepts
 
 Instead of jumping directly, into just learning react, we should first have at least an idea about how it actually works under the hood.
 
@@ -14,9 +14,9 @@ It then examines what changes have been made in the __Virtual DOM__ and then app
 
 ![vdom](./images/vdom.png)
 
-Let’s discuss about some important concepts.
+Here are a few React concepts you should be aware of:
 
-### A. Components
+### Components
 
 Components are the most fundamental building blocks of a react application. In React, a single web page can be divided into small blocks that represent a different part of the screen. Consider the layout below for an example.
 
@@ -26,14 +26,14 @@ Here every colored box that you can see, represents a different component. Each 
 
 In layman terms, a component is basically just a file that contains all the html, styling and js logic in one group.
 
-### B. JSX
+### JSX
 
 Since React uses JavaScript, you might be wondering, how we’ll be able to create and render elements on the screen. For creating a basic element through vanilla javascript, we usually use
 
 ```js
 var header = document.createElement("h1");
 header.innerHTML = "Hello World !";
-````
+```
 
 Although this approach is totally okay and we can still use this one in React, but you can imagine, how cluttered our code would look?
 
@@ -63,7 +63,7 @@ const List = () => {
 
 Looks scary for accomplishing such a simple task, right? Now, Let’s try achieving the same in the JSX way.
 
-```js
+```jsx
 const List = () => {
   const alphabets = ["a", "b", "c"];
   return(
@@ -85,7 +85,7 @@ At first sight, you might be thinking, this looks like HTML. You are not alone, 
 
 But, the funny thing is, __it’s not HTML__. It is just a syntax extension to JavaScript, or you can say some sugar syntax for defining components and their positioning inside the markup. If you’d like to learn more in depth about JSX, [refer to React docs](https://reactjs.org/docs/introducing-jsx.html).
 
-### C. Component State
+### Component State
 
 If you try to read the react documentation to figure out what state is, it can be quite difficult to grasp at first. This is why usually many of the beginner tutorials out there, tend not to cover this concept. But in my opinion, it’s not that complicated and super simple to grasp and I believe it’s a very important concept to learn for everyone who’s trying to learn react.
 
@@ -95,7 +95,9 @@ Or another example, In case someone tries to visit your website and you want to 
 
 > __It’s important to remember that whenever the state of a component changes, the component will re-render itself__. For example, once a user has logged in we’d want to take him to the dashboard, instead of the login page.
 
-More information:
+## Summary
+
+If you want to read more about React, here are some useful links:
 
 - <https://medium.com/javascript-scene/the-missing-introduction-to-react-62837cb2fd76>
 - <https://reactjs.org/tutorial/tutorial.html>

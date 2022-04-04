@@ -18,7 +18,7 @@ In brief, Webpack goes through your package and creates what it calls a dependen
 
 For an introduction with code examples on how to setup webpack and how it works read: [Webpack: A gentle introduction](https://ui.dev/webpack)
 
-More detailed information:
+If you want to read more about Webpack, here are some useful links:
 
 - <https://www.smashingmagazine.com/2017/02/a-detailed-introduction-to-webpack>
 - <https://webpack.js.org/concepts/>

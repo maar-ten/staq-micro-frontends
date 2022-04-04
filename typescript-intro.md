@@ -307,7 +307,7 @@ type Callback = (data: string) => void;
 
 ## Summary
 
-Now that you can start annotating most of your JavaScript code we can jump into the nitty gritty details of all the power available in TypeScript's Type System.
+If you want to read more about Typescript, here are some useful links:
 
 Tutorials:
 
