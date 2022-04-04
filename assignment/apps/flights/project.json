@@ -42,7 +42,8 @@
       "options": {
         "buildTarget": "flights:build",
         "hmr": true,
-        "proxyConfig": "apps/flights/proxy.conf.json"
+        "proxyConfig": "apps/flights/proxy.conf.json",
+        "port": 4203
       },
       "configurations": {
         "production": {
