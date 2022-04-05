@@ -97,7 +97,10 @@ To use internal state of a react component, you can use the `useState` function 
 
 ```jsx
 function HelloWorld() {
+  // state and setState can be called whatever you want
+  // useState can be used multiple times in the same component
   const [state, setState] = useState("...");
+
   return <h1 onClick={() => setState("world!")}>Hello {state}</h1>;
 }
 ```
@@ -120,15 +123,7 @@ function App() {
 
 When compared to Angular `props` are equivalent to fields with the `@Input` decorator, and internal state are private fields of the component.
 
----
-
-If you try to read the react documentation to figure out what state is, it can be quite difficult to grasp at first. This is why usually many of the beginner tutorials out there, tend not to cover this concept. But in my opinion, it’s not that complicated and super simple to grasp and I believe it’s a very important concept to learn for everyone who’s trying to learn react.
-
-You can imagine state of a component as the output of that component on the basis of some particular data, or a variable let’s suppose. For example, In case of an hour clock, the output of the component must change after every single hour let’s say from 1 AM to 2 AM. So, the output of that clock component at 1 AM, can be referred to as a state of that component.
-
-Or another example, In case someone tries to visit your website and you want to display a login page to the visitor, in case they aren’t logged in and display a dashboard instead, when they are logged in. Here the boolean condition whether a user is logged in or not can be referred to as state of that component.
-
-> **It’s important to remember that whenever the state of a component changes, the component will re-render itself**. For example, once a user has logged in we’d want to take him to the dashboard, instead of the login page.
+> **It’s important to remember that whenever the state of a component changes, the component will re-render itself**
 
 ## Summary
 
