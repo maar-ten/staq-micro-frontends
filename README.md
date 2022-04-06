@@ -1,5 +1,23 @@
 # Micro frontends with Webpack Module Federation
 
+- [Micro frontends with Webpack Module Federation](#micro-frontends-with-webpack-module-federation)
+  - [What's inside](#whats-inside)
+  - [Prerequisites](#prerequisites)
+    - [On summercamp wifi](#on-summercamp-wifi)
+  - [Get the code](#get-the-code)
+  - [What We’ll Be Building](#what-well-be-building)
+  - [Webpack Module Federation](#webpack-module-federation)
+  - [Example](#example)
+  - [How does Module Federation help?](#how-does-module-federation-help)
+  - [Implementation of a host](#implementation-of-a-host)
+  - [Implementation of the Remote](#implementation-of-the-remote)
+  - [Module Federation with Angular](#module-federation-with-angular)
+  - [The Shell (aka Host)](#the-shell-aka-host)
+  - [React](#react)
+  - [Typescript](#typescript)
+  - [Lit-element](#lit-element)
+  - [Current state](#current-state)
+
 ## What's inside
 
 - A starter frontend Angular app powered by [Nx.dev](https://nx.dev/).
@@ -153,23 +171,74 @@ The `uniqueName` is used to represents the host or remote in the generated bundl
 
 ## Implementation of the Remote
 
-Todo
+The remote is also a standalone application. In the case considered here, it is based on Web Components:
 
-## Angular
+```js
+class Microfrontend1 extends HTMLElement {
+
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+    }
+
+    async connectedCallback() {
+        this.shadowRoot.innerHTML = `[…]`;
+    }
+}
+
+const elementName = 'microfrontend-one';
+customElements.define(elementName, Microfrontend1);
+
+export { elementName };
+```
+
+Instead of web components, any JavaScript constructs or components based on frameworks can also be used. In this case, the frameworks can be shared between the remotes and the host as shown.
+
+The webpack configuration of the remote, which also uses the `ModuleFederationPlugin`, exports this component with the property exposes under the name component:
+
+```js
+ output: {
+      publicPath: "http://localhost:3000/",
+      uniqueName: 'mfe1',
+      […]
+ },
+ […]
+ plugins: [
+    new ModuleFederationPlugin({
+      name: "mfe1",
+      library: { type: "var", name: "mfe1" },
+      filename: "remoteEntry.js",
+      exposes: {
+        './component': "./mfe1/component"
+      },
+      shared: ["rxjs"]
+    })
+]
+```
+
+The name component refers to the corresponding file. In addition, this configuration defines the name `mfe1` for the remote. To access the remote, the host uses a path that consists of the two configured names, `mfe1` and `component`. This results in the instruction shown above:
+
+```js
+import('mfe1/component')
+```
+
+## Module Federation with Angular
 
 > New to Angular? [Read the Angular introduction](./angular-intro.md)
+
+We have shown how to use Module Federation to implement microfrontends. This part brings Angular into play and shows how to create an Angular-based microfrontend shell using the router to lazy load a separately compiled, and deployed microfrontend.
+
+## The Shell (aka Host)
+
+> New to Nx? [Read the Nx introduction](./nx-intro.md)
+
+We are a [Micro Frontend with runtime integration](./micro-frontends.md#types-of-micro-frontends-build-loading-approaches)
+
+Opdracht hier
 
 ## React
 
 > New to react? [Read the React introduction](./react-intro.md)
-
-## Nx
-
-> New to Nx? [Read the Nx introduction](./nx-intro.md)
-
-## Webpack
-
-> New to Webpack? [Read the Webpack introduction](./webpack-intro.md)
 
 ## Typescript
 
@@ -188,40 +257,3 @@ Angular -> <https://angular.io/guide/roadmap#investigate-micro-frontend-architec
 React -> react 17: <https://reactjs.org/docs/web-components.html>, react 18 mogelijk web component support, preact heeft wel support
 Vue -> Zie hier nog geen problemen.
 Lit-element -> geen problemen.
-
-## Types of micro frontends
-
-<table>
-<tbody><tr><td><b>Micro Frontend build / loading approaches</b></td>
-<td><b>Frontend Monolith</b></span></td>
-<td><b>Micro Frontend with Build-time Integration</b></td>
-<td><b>Micro Frontend with runtime integration</b></td>
-</tr><tr><td><b>Integration Approach</b></td>
-<td>No integration. One code repository with everything in it.</td>
-<td>A root application that npm installs on each of the web applications</td>
-<td>A root application that dynamically loads each independently deployed web applications</td>
-</tr><tr><td><b>Difficulty to set up</b></td>
-<td>Easy</td>
-<td>Medium</td>
-<td>Advanced</td>
-</tr><tr><td><b>Separate code repositories</b></td>
-<td>No</td>
-<td>No</td>
-<td>Yes or No</td>
-</tr><tr><td><b>Separate builds</b></td>
-<td>No</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr><tr><td><b>Separate deployments</b></td>
-<td>No</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr><tr><td><b>Advantages</b></td>
-<td>Simple</td>
-<td>Each web application can be built separately before publishing to npm</td>
-<td>Supports an independent Micro Frontend deployment and release without any dependencies. Incredibly scalable.</td>
-</tr><tr><td><b>Disadvantages</b></td>
-<td>Slow build because every piece moves at the speed of the slowest part. Deployments are all tied together</td>
-<td>Root application needs to reinstall, rebuild, and redeploy whenever one of the web applications changes.</td>
-<td>Requires knowledge of the relationship between the web app shell (container app) and the Micro Frontends that will be consumed by web app shell.</td>
-</tr></tbody></table>
