@@ -14,8 +14,10 @@ export class MFEDashboardElement extends LitElement {
 
     if (isLoggedIn) {
       return html`
-        <p>Welcome ${user}</p>
-        <button @click=${this.logout}>Logout</button>
+        <h1>Welcome ${user}</h1>
+        <button type="button" class="btn btn-primary" @click=${this.logout}>
+          Logout
+        </button>
       `;
     }
 
@@ -25,6 +27,14 @@ export class MFEDashboardElement extends LitElement {
   private logout() {
     authService.logout();
     window.location.assign('/dashboard');
+  }
+
+  createRenderRoot() {
+    /**
+     * Render template without shadow DOM. Note that shadow DOM features like
+     * encapsulated CSS and slots are unavailable.
+     */
+    return this;
   }
 }
 

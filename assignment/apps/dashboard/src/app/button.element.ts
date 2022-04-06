@@ -1,14 +1,25 @@
 import { LitElement, html } from 'lit';
 
+
 export class MFEButtonElement extends LitElement {
   static properties = {
-    buttonText: { type: String },
+    text: { type: String },
   };
 
   text = 'Push me!';
 
   protected render() {
-    return html`<button>${this.text}</button>`;
+    return html`<button type="button" class="btn btn-outline-secondary">
+      ${this.text}
+    </button>`;
+  }
+
+  createRenderRoot() {
+    /**
+     * Render template without shadow DOM. Note that shadow DOM features like
+     * encapsulated CSS and slots are unavailable.
+     */
+    return this;
   }
 }
 
