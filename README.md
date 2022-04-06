@@ -27,6 +27,112 @@ _Angular app login_
 ![Flights](./images/flights.png)
 _React app flights_
 
+## Webpack Module Federation
+
+> New to Webpack? [Read the Webpack introduction](./webpack-intro.md)
+
+The Module Federation integrated in Webpack beginning with version 5 allows the loading of separately compiled program parts. Hence, it finally provides an official solution for the implementation of micro frontends.
+
+> New to micro frontends? [Read micro frontends architecture](./micro-frontends.md)
+
+Until now, when implementing micro frontends, you had to dig a little into the bag of tricks. One reason is surely that current build tools and frameworks do not know this concept. Module Federation initiates a change of course here.
+
+It allows an approach called Module Federation for referencing program parts that are not yet known at compile time. These can be self-compiled micro frontends. In addition, the individual program parts can share libraries with each other, so that the individual bundles do not contain any duplicates.
+
+For a more detailed explanation [read Module Federation Concepts](./module-federation.md)
+
+## Example
+
+The example used here consists of a shell, which is able to load individual, separately provided micro frontends if required:
+
+![Shell](./images/shell.png)
+_Shell_
+
+The shell is represented here by the black navigation bar. The micro front end through the framed area shown below. Also, the microfrontend can also be started without a shell
+
+![Flights](./images/flights.png)
+_app flights_
+
+This is necessary to enable separate development and testing. It can also be advantageous for weaker clients, such as mobile devices, to only have to load the required program part.
+
+## How does Module Federation help?
+
+In the past, the implementation of scenarios like the one shown here was difficult, especially since tools like **Webpack assume** that the **entire program code is available when compiling**. Lazy loading is possible, but only from areas that were split off during compilation.
+
+With micro frontend architectures, in particular, one would like to compile and provide the individual program parts separately. In addition, mutual referencing via the respective URL is necessary. Hence, constructs like this would be desirable:
+
+```js
+import('http://other-microfrontend');
+```
+
+Since this is not possible for the reasons mentioned, one had to resort to approaches such as [externals](https://webpack.js.org/configuration/externals/) and manual script loading. Fortunately, this will change with the Federation module in Webpack 5.
+
+The idea behind it is simple: A so-called _host_ references a _remote_ using a configured name. What this name refers to **is not known at compile time**:
+
+![host remote](./images/host-remote.webp)
+
+This reference is only _resolved at runtime by loading a so-called remote entry point_. It is a _minimal script_ that provides the actual external url for such a configured name.
+
+## Implementation of a host
+
+The _host_ is a JavaScript application that loads a remote when needed. A dynamic import is used for this.
+
+The following host loads the component `mfe1/component` in this way, `mfe1` is the name of a configured remote and `component` the name of a file (an ES module) it provides.
+
+```js
+const rxjs = await import('rxjs');
+
+const container = document.getElementById('container');
+const flightsLink = document.getElementById('flights');
+
+rxjs.fromEvent(flightsLink, 'click').subscribe(async _ => {
+    const module = await import('mfe1/component');
+    const elm = document.createElement(module.elementName);
+    […]    
+    container.appendChild(elm);
+});
+```
+
+Webpack would normally take this reference into account when compiling and split off a separate bundle for it. To prevent this, the `ModuleFederationPlugin` is used:
+
+```js
+const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
+
+[…]
+ output: {
+      publicPath: "http://localhost:5000/",
+      uniqueName: 'shell',
+      […]
+ },
+plugins: [
+  new ModuleFederationPlugin({
+    name: "shell",
+    library: { type: "var", name: "shell" },
+    remoteType: "var",
+    remotes: {
+      mfe1: "mfe1"
+    },
+    shared: ["rxjs"]
+  })
+]
+```
+
+With its help, the remote `mfe1` (Microfrontend 1) is defined. The configuration shown here maps the internal application name `mfe1` to the same official name. Webpack **does not include** any `import` that now relates to mfe1 in **the bundles generated at compile time**.
+
+Libraries that the host should share with the remotes are mentioned in the shared array. In the case shown, this is `rxjs`. This means that the entire application only needs to load this library once. Without this specification, `rxjs` would end up in the bundles of the host as well as those of all remotes.
+
+For this to work without problems, the host and remote must agree on a common version.
+
+In addition to the settings for the `ModuleFederationPlugin`, we also need to place some `options` in the output section. The `publicPath` defines the URL under which the application can later be found. This reveals where the individual bundles of the application but also their assets, e.g. pictures or styles, can be found.
+
+The `uniqueName` is used to represents the host or remote in the generated bundles. By default, webpack uses the name from `package.json` for this. In order to avoid name conflicts when using Monorepos with several applications, it is recommended to set the `uniqueName` manually.
+
+> New to Mono repos? [Read the Monorepo introduction](./monorepo-intro.md)
+
+## Implementation of the Remote
+
+Todo
+
 ## Angular
 
 > New to Angular? [Read the Angular introduction](./angular-intro.md)
@@ -51,9 +157,6 @@ _React app flights_
 
 > New to lit-element? [Read the Lit-element introduction](./lit-intro.md)
 
-## Monorepo
-
-> New to Mono repos? [Read the Monorepo introduction](./monorepo-intro.md)
 
 ## Current state
 
