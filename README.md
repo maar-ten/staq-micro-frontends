@@ -14,7 +14,7 @@
   - [Module Federation with Angular](#module-federation-with-angular)
     - [The Shell (aka Host)](#the-shell-aka-host)
     - [Conclusion](#conclusion)
-  - [Dynamic Module Federation with Angular](#dynamic-module-federation-with-angular)
+  - [Extra Dynamic Module Federation with Angular](#extra-dynamic-module-federation-with-angular)
     - [Module Federation Config](#module-federation-config)
     - [Routing to Dynamic Micro frontends](#routing-to-dynamic-micro-frontends)
     - [Improvement for Dynamic Module Federation](#improvement-for-dynamic-module-federation)
@@ -253,7 +253,7 @@ However, this approach also puts more responsibility on the developers. For exam
 
 One also has to deal with possible version conflicts. For example, it is likely that components that were compiled with completely different Angular versions will not work together at runtime. Such cases must be avoided with conventions or at least recognized as early as possible with integration tests.
 
-## Dynamic Module Federation with Angular
+## Extra Dynamic Module Federation with Angular
 
 Assuming a more dynamic situation where the shell does not know the micro frontends or even their number upfront. Instead, this information is provided at runtime via a lookup service.
 
