@@ -3,7 +3,22 @@ import styles from './app.module.scss';
 import { BrowserRouter } from 'react-router-dom';
 
 import { Route, Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
+
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace JSX {
+    interface IntrinsicElements {
+      'mfe-button': any;
+    }
+  }
+}
+
+const WebComponentButton = lazy(() =>
+  import('dashboard/Button').then(() => ({
+    default: () => <mfe-button buttonText="Click me!"></mfe-button>,
+  }))
+);
 
 export function Home() {
   return (
@@ -33,6 +48,9 @@ export function Search() {
         <input className={styles['input']} type="text" placeholder="To" />
       </div>
       <div>
+        <Suspense fallback={() => <div>Loading...</div>}>
+          <WebComponentButton />
+        </Suspense>
         <button onClick={() => getFlights()} className={styles['button']}>
           Search
         </button>
