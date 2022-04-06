@@ -1,10 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import styles from './app.module.scss';
 import { BrowserRouter } from 'react-router-dom';
-
 import { Route, Link } from 'react-router-dom';
 import { useState, lazy, Suspense } from 'react';
+import { authService } from '@mfe/auth-core';
 
+// typescipt vertellen dat de web component mfe-button bestaat
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
@@ -16,14 +16,16 @@ declare global {
 
 const WebComponentButton = lazy(() =>
   import('dashboard/Button').then(() => ({
-    default: () => <mfe-button buttonText="Click me!"></mfe-button>,
+    default: () => <mfe-button text="Click me!"></mfe-button>,
   }))
 );
 
 export function Home() {
+  const [username] = useState(authService.getUserName());
+
   return (
     <>
-      <h1>Welcome!</h1>
+      <h1>Welcome, {username}!</h1>
 
       <p>
         <Link to="/search">Search flights.</Link>
@@ -33,7 +35,14 @@ export function Home() {
 }
 
 export function Search() {
-  const [state, setState] = useState<{ date: string }[]>([]);
+  const [state, setState] = useState<
+    {
+      date: string;
+      departure: string;
+      arrival: string;
+      price: number;
+    }[]
+  >([]);
   const getFlights = () => {
     fetch('api/flights')
       .then((res) => res.json())
@@ -41,31 +50,65 @@ export function Search() {
   };
 
   return (
-    <div id="container">
+    <div className="container">
       <h1>Flights</h1>
-      <div>
-        <input className={styles['input']} type="text" placeholder="From" />
-        <input className={styles['input']} type="text" placeholder="To" />
+      <div className="row g-2 align-items-center">
+        <div className="col-auto">
+          <input className="form-control" type="text" placeholder="From" />
+        </div>
+        <div className="col-auto">
+          <input type="text" className="form-control" placeholder="To" />
+        </div>
       </div>
-      <div>
+      <div className="mt-3">
         <Suspense fallback={() => <div>Loading...</div>}>
           <WebComponentButton />
         </Suspense>
-        <button onClick={() => getFlights()} className={styles['button']}>
+        <button
+          onClick={() => getFlights()}
+          type="button"
+          className="btn btn-primary"
+        >
           Search
         </button>
       </div>
 
       {state.length > 0 && (
-        <ul>
-          {state.map((s) => (
-            <li>{s.date}</li>
-          ))}
-        </ul>
+        <table className="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Date</th>
+              <th scope="col">Departure</th>
+              <th scope="col">Arrival</th>
+              <th scope="col">Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {state.map((s, i) => (
+              <tr key={s.date}>
+                <th scope="row">{i}</th>
+                <td>{dateFormat(s.date)}</td>
+                <td>{s.departure}</td>
+                <td>{s.arrival}</td>
+                <td>{numberFormat(s.price)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );
 }
+
+const numberFormat = (value: number) =>
+  new Intl.NumberFormat('nl-NL', {
+    style: 'currency',
+    currency: 'EUR',
+  }).format(value);
+
+const dateFormat = (value: string) =>
+  new Intl.DateTimeFormat('nl-NL').format(new Date(value));
 
 export function App(props: { rootUrl: string }) {
   return (
