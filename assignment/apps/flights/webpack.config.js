@@ -1,4 +1,5 @@
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
+const reactConfig = require('@nrwl/react/plugins/webpack');
 const mf = require('@angular-architects/module-federation/webpack');
 const { merge } = require('webpack-merge');
 const path = require('path');
@@ -27,6 +28,7 @@ sharedMappings.register(
 );
 
 module.exports = (config) => {
+  config = reactConfig(config);
   return merge(config, {
     output: {
       uniqueName: 'flights',
