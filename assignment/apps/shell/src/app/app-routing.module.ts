@@ -37,7 +37,10 @@ const routes: Routes = [
 @NgModule({
   imports: [
     CommonModule,
-    RouterModule.forRoot(routes, { initialNavigation: 'enabledBlocking' }),
+    RouterModule.forRoot(routes, {
+      initialNavigation: 'enabledBlocking',
+      onSameUrlNavigation: 'reload',
+    }),
   ],
   exports: [RouterModule],
 })
