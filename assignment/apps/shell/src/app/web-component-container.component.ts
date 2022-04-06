@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'mfe-web-component-container',
-  templateUrl: './web-component-container.component.html',
+  template: '<div #container></div>',
 })
 export class WebComponentContainerComponent implements OnInit {
   @ViewChild('container', { static: true })
