@@ -1,5 +1,30 @@
 # Micro frontends with Webpack Module Federation
 
+- [Micro frontends with Webpack Module Federation](#micro-frontends-with-webpack-module-federation)
+  - [What's inside](#whats-inside)
+  - [Prerequisites](#prerequisites)
+    - [On summercamp wifi](#on-summercamp-wifi)
+  - [Get the code](#get-the-code)
+  - [What We’ll Be Building](#what-well-be-building)
+  - [Webpack Module Federation](#webpack-module-federation)
+  - [Example](#example)
+  - [How does Module Federation help?](#how-does-module-federation-help)
+    - [Implementation of a host](#implementation-of-a-host)
+    - [Implementation of the Remote](#implementation-of-the-remote)
+  - [Module Federation with Angular](#module-federation-with-angular)
+    - [The Shell (aka Host)](#the-shell-aka-host)
+    - [Conclusion](#conclusion)
+  - [Dynamic Module Federation with Angular](#dynamic-module-federation-with-angular)
+    - [Module Federation Config](#module-federation-config)
+    - [Routing to Dynamic Micro frontends](#routing-to-dynamic-micro-frontends)
+    - [Improvement for Dynamic Module Federation](#improvement-for-dynamic-module-federation)
+    - [Bonus: Dynamic Routes for Dynamic Microfrontends](#bonus-dynamic-routes-for-dynamic-microfrontends)
+    - [Conclusion](#conclusion-1)
+  - [React](#react)
+  - [Typescript](#typescript)
+  - [Lit-element](#lit-element)
+  - [Current state](#current-state)
+
 ## What's inside
 
 - A starter frontend Angular app powered by [Nx.dev](https://nx.dev/).
@@ -13,6 +38,28 @@ Let's get started!
 
 - vscode / webstorm
 - node 14, npm 6
+
+### On summercamp wifi
+
+> Use when network/wifi is slow/unstable
+
+On the summercamp network there is a nexus server with the node packages already cached. To make use of the cache rename the following files:
+
+- `./assignment/.npmrc.summercamp` to `./assignment/.npmrc`
+  - shell: `mv ./assignment/.npmrc.summercamp ./assignment/.npmrc`
+- `./assignment/package-lock.json.summercamp` to `./assignment/package-lock.json`
+  - shell: `rm -f ./assignment/package-lock.json && mv ./assignment/package-lock.json.summercamp ./assignment/package-lock.json`
+
+## Get the code
+
+```sh
+git clone https://staquser:St4q2022!@git.quintor.nl/staq/staq-2022-micro-frontends.git
+cd staq-2022-micro-frontends/assignment
+npm install
+npm run start:all
+```
+
+Open <http://127.0.0.1:4200> in a browser. You should see a black menu bar.
 
 ## What We’ll Be Building
 
@@ -73,7 +120,7 @@ The idea behind it is simple: A so-called _host_ references a _remote_ using a c
 
 This reference is only _resolved at runtime by loading a so-called remote entry point_. It is a _minimal script_ that provides the actual external url for such a configured name.
 
-## Implementation of a host
+### Implementation of a host
 
 The _host_ is a JavaScript application that loads a remote when needed. A dynamic import is used for this.
 
@@ -129,25 +176,131 @@ The `uniqueName` is used to represents the host or remote in the generated bundl
 
 > New to Mono repos? [Read the Monorepo introduction](./monorepo-intro.md)
 
-## Implementation of the Remote
+### Implementation of the Remote
 
-Todo
+The remote is also a standalone application. In the case considered here, it is based on Web Components:
 
-## Angular
+```js
+class Microfrontend1 extends HTMLElement {
+
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+    }
+
+    async connectedCallback() {
+        this.shadowRoot.innerHTML = `[…]`;
+    }
+}
+
+const elementName = 'microfrontend-one';
+customElements.define(elementName, Microfrontend1);
+
+export { elementName };
+```
+
+Instead of web components, any JavaScript constructs or components based on frameworks can also be used. In this case, the frameworks can be shared between the remotes and the host as shown.
+
+The webpack configuration of the remote, which also uses the `ModuleFederationPlugin`, exports this component with the property exposes under the name component:
+
+```js
+ output: {
+      publicPath: "http://localhost:3000/",
+      uniqueName: 'mfe1',
+      […]
+ },
+ […]
+ plugins: [
+    new ModuleFederationPlugin({
+      name: "mfe1",
+      library: { type: "var", name: "mfe1" },
+      filename: "remoteEntry.js",
+      exposes: {
+        './component': "./mfe1/component"
+      },
+      shared: ["rxjs"]
+    })
+]
+```
+
+The name component refers to the corresponding file. In addition, this configuration defines the name `mfe1` for the remote. To access the remote, the host uses a path that consists of the two configured names, `mfe1` and `component`. This results in the instruction shown above:
+
+```js
+import('mfe1/component')
+```
+
+## Module Federation with Angular
 
 > New to Angular? [Read the Angular introduction](./angular-intro.md)
+
+We have shown how to use Module Federation to implement microfrontends. This part brings Angular into play and shows how to create an Angular-based microfrontend shell using the router to lazy load a separately compiled, and deployed microfrontend.
+
+### The Shell (aka Host)
+
+> New to Nx? [Read the Nx introduction](./nx-intro.md)
+
+We are a [Micro Frontend with runtime integration](./micro-frontends.md#types-of-micro-frontends-build-loading-approaches)
+
+Opdracht hier
+
+### Conclusion
+
+The implementation of micro frontends has so far involved numerous tricks and workarounds. Webpack Module Federation finally provides a simple and solid solution for this. To improve performance, libraries can be shared and strategies for dealing with incompatible versions can be configured.
+
+It is also interesting that the micro frontends are loaded by Webpack under the hood. There is no trace of this in the source code of the host or the remote. This simplifies the use of module federation and the resulting source code, which does not require additional micro frontend frameworks.
+
+However, this approach also puts more responsibility on the developers. For example, you have to ensure that the components that are only loaded at runtime and that were not yet known when compiling also interact as desired.
+
+One also has to deal with possible version conflicts. For example, it is likely that components that were compiled with completely different Angular versions will not work together at runtime. Such cases must be avoided with conventions or at least recognized as early as possible with integration tests.
+
+## Dynamic Module Federation with Angular
+
+Assuming a more dynamic situation where the shell does not know the micro frontends or even their number upfront. Instead, this information is provided at runtime via a lookup service.
+
+Plaatje?
+
+For all micro frontends the shell gets informed about at runtime it displays a menu item. When clicking it, the micro frontend is loaded and displayed by the shell’s router.
+
+### Module Federation Config
+
+### Routing to Dynamic Micro frontends
+
+### Improvement for Dynamic Module Federation
+
+This was quite easy, wasn’t it? However, we can improve this solution a bit. Ideally, we load the remote entry upfront before Angular bootstraps. In this early phase, Module Federation tries to determine the highest compatible versions of all dependencies.
+
+Let’s assume, the shell provides version `1.0.0` of a dependency (specifying `^1.0.0` in its `package.json`) and the micro frontend uses version `1.1.0` (specifying `^1.1.0` in its `package.json`). In this case, they would go with version `1.1.0`. However, this is only possible if the remote’s entry is loaded upfront.
+
+> versie mismatch uitleggen? hier, later, andere MD file of niet?
+
+To achieve this goal, let’s use the helper function `loadRemoteEntry` in our `main.ts`
+
+```ts
+import { loadRemoteEntry } from '@angular-architects/module-federation';
+
+Promise.all([
+  loadRemoteEntry({type: 'module', remoteEntry: 'http://localhost:3000/remoteEntry.js'})
+])
+  .catch(err => console.error('Error loading remote entries', err))
+  .then(() => import('./bootstrap'))
+  .catch(err => console.error(err));
+```
+
+Here, we need to remember, that the `@angular-architects/module-federation` plugin moves the contents of the original `main.ts` into the `bootstrap.ts` file. Also, it loads the `bootstrap.ts` with a dynamic import in the `main.ts`. This is necessary because the dynamic import gives _Module Federation_ the needed time to negotiate the versions of the shared libraries to use with all the remotes.
+
+Also, loading the remote entry needs to happen before importing `bootstrap.ts` so that its metadata can be respected during the negotiation.
+
+### Bonus: Dynamic Routes for Dynamic Microfrontends
+
+Mogelijk idee om zelf te implementeren?
+
+### Conclusion
+
+Dynamic Module Federation provides more flexibility as it allows loading micro frontends we don’t have to know at compile time. We don’t even have to know their number upfront. This is possible because of the runtime API provided by webpack. To make using it a bit easier, the `@angular-architects/module-federation` plugin wrap it nicely into some convenience functions.
 
 ## React
 
 > New to react? [Read the React introduction](./react-intro.md)
-
-## Nx
-
-> New to Nx? [Read the Nx introduction](./nx-intro.md)
-
-## Webpack
-
-> New to Webpack? [Read the Webpack introduction](./webpack-intro.md)
 
 ## Typescript
 
@@ -156,7 +309,6 @@ Todo
 ## Lit-element
 
 > New to lit-element? [Read the Lit-element introduction](./lit-intro.md)
-
 
 ## Current state
 
@@ -167,40 +319,3 @@ Angular -> <https://angular.io/guide/roadmap#investigate-micro-frontend-architec
 React -> react 17: <https://reactjs.org/docs/web-components.html>, react 18 mogelijk web component support, preact heeft wel support
 Vue -> Zie hier nog geen problemen.
 Lit-element -> geen problemen.
-
-## Types of micro frontends
-
-<table>
-<tbody><tr><td><b>Micro Frontend build / loading approaches</b></td>
-<td><b>Frontend Monolith</b></span></td>
-<td><b>Micro Frontend with Build-time Integration</b></td>
-<td><b>Micro Frontend with runtime integration</b></td>
-</tr><tr><td><b>Integration Approach</b></td>
-<td>No integration. One code repository with everything in it.</td>
-<td>A root application that npm installs on each of the web applications</td>
-<td>A root application that dynamically loads each independently deployed web applications</td>
-</tr><tr><td><b>Difficulty to set up</b></td>
-<td>Easy</td>
-<td>Medium</td>
-<td>Advanced</td>
-</tr><tr><td><b>Separate code repositories</b></td>
-<td>No</td>
-<td>No</td>
-<td>Yes or No</td>
-</tr><tr><td><b>Separate builds</b></td>
-<td>No</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr><tr><td><b>Separate deployments</b></td>
-<td>No</td>
-<td>Yes</td>
-<td>Yes</td>
-</tr><tr><td><b>Advantages</b></td>
-<td>Simple</td>
-<td>Each web application can be built separately before publishing to npm</td>
-<td>Supports an independent Micro Frontend deployment and release without any dependencies. Incredibly scalable.</td>
-</tr><tr><td><b>Disadvantages</b></td>
-<td>Slow build because every piece moves at the speed of the slowest part. Deployments are all tied together</td>
-<td>Root application needs to reinstall, rebuild, and redeploy whenever one of the web applications changes.</td>
-<td>Requires knowledge of the relationship between the web app shell (container app) and the Micro Frontends that will be consumed by web app shell.</td>
-</tr></tbody></table>
