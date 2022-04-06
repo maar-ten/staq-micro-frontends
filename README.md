@@ -9,10 +9,17 @@
   - [Webpack Module Federation](#webpack-module-federation)
   - [Example](#example)
   - [How does Module Federation help?](#how-does-module-federation-help)
-  - [Implementation of a host](#implementation-of-a-host)
-  - [Implementation of the Remote](#implementation-of-the-remote)
+    - [Implementation of a host](#implementation-of-a-host)
+    - [Implementation of the Remote](#implementation-of-the-remote)
   - [Module Federation with Angular](#module-federation-with-angular)
-  - [The Shell (aka Host)](#the-shell-aka-host)
+    - [The Shell (aka Host)](#the-shell-aka-host)
+    - [Conclusion](#conclusion)
+  - [Dynamic Module Federation with Angular](#dynamic-module-federation-with-angular)
+    - [Module Federation Config](#module-federation-config)
+    - [Routing to Dynamic Microfrontends](#routing-to-dynamic-microfrontends)
+    - [Improvement for Dynamic Module Federation](#improvement-for-dynamic-module-federation)
+    - [Bonus: Dynamic Routes for Dynamic Microfrontends](#bonus-dynamic-routes-for-dynamic-microfrontends)
+    - [Conclusion](#conclusion-1)
   - [React](#react)
   - [Typescript](#typescript)
   - [Lit-element](#lit-element)
@@ -113,7 +120,7 @@ The idea behind it is simple: A so-called _host_ references a _remote_ using a c
 
 This reference is only _resolved at runtime by loading a so-called remote entry point_. It is a _minimal script_ that provides the actual external url for such a configured name.
 
-## Implementation of a host
+### Implementation of a host
 
 The _host_ is a JavaScript application that loads a remote when needed. A dynamic import is used for this.
 
@@ -169,7 +176,7 @@ The `uniqueName` is used to represents the host or remote in the generated bundl
 
 > New to Mono repos? [Read the Monorepo introduction](./monorepo-intro.md)
 
-## Implementation of the Remote
+### Implementation of the Remote
 
 The remote is also a standalone application. In the case considered here, it is based on Web Components:
 
@@ -228,13 +235,68 @@ import('mfe1/component')
 
 We have shown how to use Module Federation to implement microfrontends. This part brings Angular into play and shows how to create an Angular-based microfrontend shell using the router to lazy load a separately compiled, and deployed microfrontend.
 
-## The Shell (aka Host)
+### The Shell (aka Host)
 
 > New to Nx? [Read the Nx introduction](./nx-intro.md)
 
 We are a [Micro Frontend with runtime integration](./micro-frontends.md#types-of-micro-frontends-build-loading-approaches)
 
 Opdracht hier
+
+### Conclusion
+
+The implementation of micro frontends has so far involved numerous tricks and workarounds. Webpack Module Federation finally provides a simple and solid solution for this. To improve performance, libraries can be shared and strategies for dealing with incompatible versions can be configured.
+
+It is also interesting that the micro frontends are loaded by Webpack under the hood. There is no trace of this in the source code of the host or the remote. This simplifies the use of module federation and the resulting source code, which does not require additional micro frontend frameworks.
+
+However, this approach also puts more responsibility on the developers. For example, you have to ensure that the components that are only loaded at runtime and that were not yet known when compiling also interact as desired.
+
+One also has to deal with possible version conflicts. For example, it is likely that components that were compiled with completely different Angular versions will not work together at runtime. Such cases must be avoided with conventions or at least recognized as early as possible with integration tests.
+
+## Dynamic Module Federation with Angular
+
+Assuming a more dynamic situation where the shell does not know the microfrontends or even their number upfront. Instead, this information is provided at runtime via a lookup service.
+
+Plaatje?
+
+For all microfrontends the shell gets informed about at runtime it displays a menu item. When clicking it, the microfrontend is loaded and displayed by the shell’s router.
+
+### Module Federation Config
+
+### Routing to Dynamic Microfrontends
+
+### Improvement for Dynamic Module Federation
+
+This was quite easy, wasn’t it? However, we can improve this solution a bit. Ideally, we load the remote entry upfront before Angular bootstraps. In this early phase, Module Federation tries to determine the highest compatible versions of all dependencies.
+
+Let’s assume, the shell provides version 1.0.0 of a dependency (specifying ^1.0.0 in its package.json) and the micro frontend uses version 1.1.0 (specifying ^1.1.0 in its package.json). In this case, they would go with version 1.1.0. However, this is only possible if the remote’s entry is loaded upfront.
+
+> versie mismatch uitleggen? hier, later, andere MD file of niet?
+
+To achieve this goal, let’s use the helper function loadRemoteEntry in our `main.ts`
+
+```ts
+import { loadRemoteEntry } from '@angular-architects/module-federation';
+
+Promise.all([
+   loadRemoteEntry({type: 'module', remoteEntry: 'http://localhost:3000/remoteEntry.js'})
+])
+.catch(err => console.error('Error loading remote entries', err))
+.then(() => import('./bootstrap'))
+.catch(err => console.error(err));
+```
+
+Here, we need to remember, that the `@angular-architects/module-federation` plugin moves the contents of the original `main.ts` into the `bootstrap.ts` file. Also, it loads the `bootstrap.ts` with a dynamic import in the `main.ts`. This is necessary because the dynamic import gives _Module Federation_ the needed time to negotiate the versions of the shared libraries to use with all the remotes.
+
+Also, loading the remote entry needs to happen before importing `bootstrap.ts` so that its metadata can be respected during the negotiation.
+
+### Bonus: Dynamic Routes for Dynamic Microfrontends
+
+Mogelijk idee om zelf te implementeren?
+
+### Conclusion
+
+Dynamic Module Federation provides more flexibility as it allows loading microfrontends we don’t have to know at compile time. We don’t even have to know their number upfront. This is possible because of the runtime API provided by webpack. To make using it a bit easier, the `@angular-architects/module-federation` plugin wrap it nicely into some convenience functions.
 
 ## React
 
