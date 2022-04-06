@@ -16,7 +16,7 @@
     - [Conclusion](#conclusion)
   - [Dynamic Module Federation with Angular](#dynamic-module-federation-with-angular)
     - [Module Federation Config](#module-federation-config)
-    - [Routing to Dynamic Microfrontends](#routing-to-dynamic-microfrontends)
+    - [Routing to Dynamic Micro frontends](#routing-to-dynamic-micro-frontends)
     - [Improvement for Dynamic Module Federation](#improvement-for-dynamic-module-federation)
     - [Bonus: Dynamic Routes for Dynamic Microfrontends](#bonus-dynamic-routes-for-dynamic-microfrontends)
     - [Conclusion](#conclusion-1)
@@ -255,35 +255,35 @@ One also has to deal with possible version conflicts. For example, it is likely 
 
 ## Dynamic Module Federation with Angular
 
-Assuming a more dynamic situation where the shell does not know the microfrontends or even their number upfront. Instead, this information is provided at runtime via a lookup service.
+Assuming a more dynamic situation where the shell does not know the micro frontends or even their number upfront. Instead, this information is provided at runtime via a lookup service.
 
 Plaatje?
 
-For all microfrontends the shell gets informed about at runtime it displays a menu item. When clicking it, the microfrontend is loaded and displayed by the shell’s router.
+For all micro frontends the shell gets informed about at runtime it displays a menu item. When clicking it, the micro frontend is loaded and displayed by the shell’s router.
 
 ### Module Federation Config
 
-### Routing to Dynamic Microfrontends
+### Routing to Dynamic Micro frontends
 
 ### Improvement for Dynamic Module Federation
 
 This was quite easy, wasn’t it? However, we can improve this solution a bit. Ideally, we load the remote entry upfront before Angular bootstraps. In this early phase, Module Federation tries to determine the highest compatible versions of all dependencies.
 
-Let’s assume, the shell provides version 1.0.0 of a dependency (specifying ^1.0.0 in its package.json) and the micro frontend uses version 1.1.0 (specifying ^1.1.0 in its package.json). In this case, they would go with version 1.1.0. However, this is only possible if the remote’s entry is loaded upfront.
+Let’s assume, the shell provides version `1.0.0` of a dependency (specifying `^1.0.0` in its `package.json`) and the micro frontend uses version `1.1.0` (specifying `^1.1.0` in its `package.json`). In this case, they would go with version `1.1.0`. However, this is only possible if the remote’s entry is loaded upfront.
 
 > versie mismatch uitleggen? hier, later, andere MD file of niet?
 
-To achieve this goal, let’s use the helper function loadRemoteEntry in our `main.ts`
+To achieve this goal, let’s use the helper function `loadRemoteEntry` in our `main.ts`
 
 ```ts
 import { loadRemoteEntry } from '@angular-architects/module-federation';
 
 Promise.all([
-   loadRemoteEntry({type: 'module', remoteEntry: 'http://localhost:3000/remoteEntry.js'})
+  loadRemoteEntry({type: 'module', remoteEntry: 'http://localhost:3000/remoteEntry.js'})
 ])
-.catch(err => console.error('Error loading remote entries', err))
-.then(() => import('./bootstrap'))
-.catch(err => console.error(err));
+  .catch(err => console.error('Error loading remote entries', err))
+  .then(() => import('./bootstrap'))
+  .catch(err => console.error(err));
 ```
 
 Here, we need to remember, that the `@angular-architects/module-federation` plugin moves the contents of the original `main.ts` into the `bootstrap.ts` file. Also, it loads the `bootstrap.ts` with a dynamic import in the `main.ts`. This is necessary because the dynamic import gives _Module Federation_ the needed time to negotiate the versions of the shared libraries to use with all the remotes.
@@ -296,7 +296,7 @@ Mogelijk idee om zelf te implementeren?
 
 ### Conclusion
 
-Dynamic Module Federation provides more flexibility as it allows loading microfrontends we don’t have to know at compile time. We don’t even have to know their number upfront. This is possible because of the runtime API provided by webpack. To make using it a bit easier, the `@angular-architects/module-federation` plugin wrap it nicely into some convenience functions.
+Dynamic Module Federation provides more flexibility as it allows loading micro frontends we don’t have to know at compile time. We don’t even have to know their number upfront. This is possible because of the runtime API provided by webpack. To make using it a bit easier, the `@angular-architects/module-federation` plugin wrap it nicely into some convenience functions.
 
 ## React
 
