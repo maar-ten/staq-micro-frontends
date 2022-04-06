@@ -14,6 +14,28 @@ Let's get started!
 - vscode / webstorm
 - node 14, npm 6
 
+### On summercamp wifi
+
+> Use when network/wifi is slow/unstable
+
+On the summercamp network there is a nexus server with the node packages already cached. To make use of the cache rename the following files:
+
+- `./assignment/.npmrc.summercamp` to `./assignment/.npmrc`
+  - shell: `mv ./assignment/.npmrc.summercamp ./assignment/.npmrc`
+- `./assignment/package-lock.json.summercamp` to `./assignment/package-lock.json`
+  - shell: `rm -f ./assignment/package-lock.json && mv ./assignment/package-lock.json.summercamp ./assignment/package-lock.json`
+
+## Get the code
+
+```sh
+git clone https://staquser:St4q2022!@git.quintor.nl/staq/staq-2022-micro-frontends.git
+cd staq-2022-micro-frontends/assignment
+npm install
+npm run start:all
+```
+
+Open <http://127.0.0.1:4200> in a browser. You should see a black menu bar.
+
 ## What We’ll Be Building
 
 For this workshop, we’ll be building a simple app that the user can login and search for flight information. The data will be supplied by NextJS HTTP API's we already supplied. The login page is an Angular Application. The flights page is a React Application. The Dashboard is a lit-element component.
@@ -156,7 +178,6 @@ Todo
 ## Lit-element
 
 > New to lit-element? [Read the Lit-element introduction](./lit-intro.md)
-
 
 ## Current state
 
