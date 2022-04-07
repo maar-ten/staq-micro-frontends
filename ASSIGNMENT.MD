@@ -1,158 +1,47 @@
-## Generate nx mono repo
+# Assignment introduction
 
-`npx create-nx-workspace@13.9.5 --preset=empty --name=mfe --nx-cloud false`
+- [Assignment introduction](#assignment-introduction)
+  - [Install nx web](#install-nx-web)
+  - [Generate auth library](#generate-auth-library)
+  - [Create an authorization service](#create-an-authorization-service)
+  - [Create login application](#create-login-application)
+  - [Add FormsModule to entry.module.ts import list in the login application](#add-formsmodule-to-entrymodulets-import-list-in-the-login-application)
+  - [Replace entry.component.ts with](#replace-entrycomponentts-with)
+- [Add a web component based dashboard](#add-a-web-component-based-dashboard)
+  - [Install Lit](#install-lit)
+  - [Create dashboard application](#create-dashboard-application)
+  - [Create a dashboard web component](#create-a-dashboard-web-component)
+  - [Change the dashboard project.json](#change-the-dashboard-projectjson)
+  - [Add a custom webpack configuration](#add-a-custom-webpack-configuration)
+  - [Update de dashboard project index html](#update-de-dashboard-project-index-html)
+  - [Add a remote for the dashboard to the shell application](#add-a-remote-for-the-dashboard-to-the-shell-application)
+  - [Let typescript know about the remote in the shell application](#let-typescript-know-about-the-remote-in-the-shell-application)
+  - [Add a remote web component wrapper to the shell application](#add-a-remote-web-component-wrapper-to-the-shell-application)
+  - [Add the dashboard route to the shell application module](#add-the-dashboard-route-to-the-shell-application-module)
+- [Add flight information application using react](#add-flight-information-application-using-react)
+  - [Install nx react library](#install-nx-react-library)
+  - [Generate react application](#generate-react-application)
+  - [Add a flights and flight search component](#add-a-flights-and-flight-search-component)
+  - [Update react project.json](#update-react-projectjson)
+  - [Add a custom webpack configuration](#add-a-custom-webpack-configuration-1)
+  - [Add the flights remote to the shell application](#add-the-flights-remote-to-the-shell-application)
+  - [Let typescript know about the flights remote](#let-typescript-know-about-the-flights-remote)
+  - [Add a remote react wrapper to the shell application](#add-a-remote-react-wrapper-to-the-shell-application)
+  - [Add the flights route to the shell application module](#add-the-flights-route-to-the-shell-application-module)
+  - [Add react shared dependencies to shell application webpack configuration](#add-react-shared-dependencies-to-shell-application-webpack-configuration)
+- [Use remote web components in the react application](#use-remote-web-components-in-the-react-application)
+  - [Expose another web component from the dashboard application](#expose-another-web-component-from-the-dashboard-application)
+  - [Expose this new component using module federation](#expose-this-new-component-using-module-federation)
+  - [Let typescript know about the remote module](#let-typescript-know-about-the-remote-module)
+  - [Add dashboard as a remote to the flights application](#add-dashboard-as-a-remote-to-the-flights-application)
+  - [Add the remote component to the existing React component](#add-the-remote-component-to-the-existing-react-component)
+  - [Next steps](#next-steps)
 
-## Go to project directory
-
-`cd mfe`
-
-## Install nx angular
-
-`npm install -D @nrwl/angular@13.9.5`
-
-## Add following to package.json
-
-We will add a start all script the package json that we can use to launch all applications and shut down easily.
-
-```json
-"scripts": {
-    "start": "nx serve",
-+   "start:all": "nx run-many --target serve --all --parallel 6",
-    "build": "nx build",
-    "test": "nx test"
-  },
-```
-
-## Create shell application
-
-`npx nx g @nrwl/angular:app shell --mfe --mfeType=host --routing=true --skipTests --style=css --e2eTestRunner=none`
-
-## Replace app.component.html with
-
-```html
-<ul>
-  <li><img src="../assets/angular.png" width="50" /></li>
-  <li><a routerLink="/">Home</a></li>
-  <li><a routerLink="/flights">Flights</a></li>
-</ul>
-
-<router-outlet></router-outlet>
-```
-
-## Update app.component.css with
-
-```css
-ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background-color: #333;
-
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-
-li {
-  float: left;
-  height: 50px;
-  margin-top: auto;
-  margin-bottom: auto;
-}
-
-li a {
-  display: block;
-  color: white;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-li a:hover {
-  background-color: #111;
-}
-```
-
-## Add this to styles.css
-
-```css
-/* You can add global styles to this file, and also import other style files */
-
-body {
-  padding-top: 80px;
-  padding-left: 10px;
-}
-```
-
-## Update index.html head with this style sheet
-
-```html
-<link
-  href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-  rel="stylesheet"
-  integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
-  crossorigin="anonymous"
-/>
-```
-
-## Install nx nest
-
-`npm install -D @nrwl/nest@13.9.5`
-
-## Create nest application
-
-`npx nx g @nrwl/nest:app backend --frontendProject shell`
-
-## Replace app.controller.ts with following
-
-```ts
-import { Controller, Get, Post } from "@nestjs/common";
-import { AppService } from "./app.service";
-
-@Controller()
-export class AppController {
-  constructor(private readonly appService: AppService) {}
-
-  @Get("/flights")
-  getData() {
-    return this.appService.getData();
-  }
-
-  @Post("/login")
-  login() {
-    return this.appService.login();
-  }
-}
-```
-
-## Replace app.service.ts with the following
-
-```ts
-import { Injectable } from "@nestjs/common";
-
-@Injectable()
-export class AppService {
-  getData() {
-    return [
-      { date: "2022-03-04", departure: "13:00", arrival: "17:00", price: 500 },
-      { date: "2022-03-04", departure: "15:00", arrival: "19:00", price: 550 },
-    ];
-  }
-
-  login() {
-    return { token: "abcd" };
-  }
-}
-```
-
-# Starting point
+> [Clean setup](./clean-setup.md) gives you the cmd's if want to do everything yourself
 
 When you open the app with `npm run start:all` you see a top menu bar, but there is nothing assigned to the application routs.
 
-**Note that if you make changes to webpack configurations or project configurations you will have to shut down and start the application again to have the changes take effect.**
+**Note that if you make changes to webpack configurations or project configurations you will have to shut down and start the application again to have the changes take effect.
 
 First of all we're going to add an authentication library that can be shared between our different applications as a direct dependency. For this we will use an nx web library.
 
@@ -210,13 +99,13 @@ Run the following command to generate the application.
 
 `npx nx g @nrwl/angular:app login --mfe --mfeType=remote --port=4201 --host=shell --routing=true --skipTests --style=css --e2eTestRunner=none`
 
-Note: We provided remote as the --mfeType. This tells the generator to create a Webpack configuration file that is ready to be consumed by a Host application.
+_Note_: We provided remote as the `--mfeType`. This tells the generator to create a Webpack configuration file that is ready to be consumed by a Host application.
 
-Note: We provided 4201 as the --port. This helps when developing locally as it will tell the serve target to serve on a different port reducing the chance of multiple remote apps trying to run on the same port.
+_Note_: We provided 4201 as the `--port`. This helps when developing locally as it will tell the serve target to serve on a different port reducing the chance of multiple remote apps trying to run on the same port.
 
-Note: We provided --host=shell as an option. This tells the generator that this remote app will be consumed by the Shell application. The generator will automatically link these two apps together in the webpack.config.js
+_Note_: We provided `--host=shell` as an option. This tells the generator that this remote app will be consumed by the Shell application. The generator will automatically link these two apps together in the webpack.config.js
 
-Note: The RemoteEntryModule generated will be imported in app.module.ts file, however, it is not used in the AppModule itself. This it to allow TS to find the Module during compilation, allowing it to be included in the built bundle. This is required for the Module Federation Plugin to expose the Module correctly. You can choose to import the RemoteEntryModule in the AppModule if you wish, however, it is not necessary.
+_Note_: The `RemoteEntryModule` generated will be imported in `app.module.ts file, however, it is not used in the AppModule itself. This it to allow TS to find the Module during compilation, allowing it to be included in the built bundle. This is required for the Module Federation Plugin to expose the Module correctly. You can choose to import the RemoteEntryModule in the AppModule if you wish, however, it is not necessary.
 
 ## Add FormsModule to entry.module.ts import list in the login application
 
@@ -300,7 +189,7 @@ export class RemoteEntryComponent {
 }
 ```
 
-If you now start the application with `npm run start:all` and open the shell on http://localhost:4200/login you should see the login component in the shell. You can also view the login application home page at http://localhost:4201. As you can see the remote application can run independently. Currently it is not using the login component itself, but it could do so without issues, both exposing a module and consuming it.
+If you now start the application with `npm run start:all` and open the shell on <http://localhost:4200/login> you should see the login component in the shell. You can also view the login application home page at <http://localhost:4201>. As you can see the remote application can run independently. Currently it is not using the login component itself, but it could do so without issues, both exposing a module and consuming it.
 
 # Add a web component based dashboard
 
@@ -888,7 +777,7 @@ import { ReactContainerComponent } from "./react-component-container.component";
 export class AppModule {}
 ```
 
-## Add react shared dependencies to shell application webpack configuration.
+## Add react shared dependencies to shell application webpack configuration
 
 If you try and start the application now, you will see that it will build, but when you go to the flights route you will see an error in the console from the react component that you cannot use hooks because there are multiple versions of react loaded.
 
@@ -1119,12 +1008,12 @@ export function Home() {
 
 When you start the application again you should see the current wheather component inside the flights component when you got to `http://localhost:4200/flights`.
 
-# Next steps
+## Next steps
 
 Congratulations if you made it this far! We hope you learned a lot. Here are some optional assignments you could try out.
 
 - Add an authorization guard to the flights route that navigates you to the login page if you're not logged in. See the documentation for [CanActivate](https://angular.io/api/router/CanActivate) for more information.
 
-- Split the backend out into a flights backend and login backend to similute a vertical stack split of functionality.
+- Split the backend out into a flights backend and login backend to simulate a vertical stack split of functionality.
 
 - Add dynamic routes. You won't always know the remote applications at build time, you might load your routes via an api. Warning, this is a very advanced use-case. Further reading can be found [here](https://nx.dev/micro-frontends/dynamic-module-federation-with-angular).
