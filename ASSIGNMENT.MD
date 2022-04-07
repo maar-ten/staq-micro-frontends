@@ -884,9 +884,11 @@ import { ReactContainerComponent } from "./react-component-container.component";
 export class AppModule {}
 ```
 
-If you try and start the application now, you will see that it will build, but when you go to the flights route you will see an error in the console.
+## Add react shared dependencies to shell application webpack configuration.
 
-## Voeg het volgende toe aan de share lijst van de shell webpack.config.js
+If you try and start the application now, you will see that it will build, but when you go to the flights route you will see an error in the console from the react component that you cannot use hooks because there are multiple versions of react loaded.
+
+In order to fix this we have to add the following items to the shared list of the module federation plugin in the shell application, without this, module federation does not know how to resolve the shared dependencies. If you look you will see we already did this in the react application webpack configuration.
 
 ```js
 {
@@ -911,3 +913,5 @@ If you try and start the application now, you will see that it will build, but w
   },
 }
 ```
+
+After this is added, the flights route should work!.
