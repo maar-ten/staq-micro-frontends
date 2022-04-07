@@ -50,6 +50,7 @@ module.exports = (config) =>
         exposes: {
           './Module': 'apps/dashboard/src/app/app.element.ts',
           './Button': 'apps/dashboard/src/app/button.element.ts',
+          './CurrentWeather': 'apps/dashboard/src/app/current-weather.element.ts',
         },
         library: {
           type: 'module',
