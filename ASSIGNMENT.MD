@@ -150,9 +150,11 @@ export class AppService {
 
 # Starting point
 
-When you open the app now you see a top menu bar, but there is nothing assinged to the application routs.
+When you open the app with `npm run start:all` you see a top menu bar, but there is nothing assigned to the application routs.
 
-We're going to add an authentication library that can be shared between our different applications as a direct dependency. For this we will use an nx web library.
+**Note that if you make changes to webpack configurations or project configurations you will have to shut down and start the application again to have the changes take effect.**
+
+First of all we're going to add an authentication library that can be shared between our different applications as a direct dependency. For this we will use an nx web library.
 
 ## Install nx web
 
@@ -162,9 +164,11 @@ We're going to add an authentication library that can be shared between our diff
 
 `npx nx g @nrwl/web:lib auth --unitTestRunner=none`
 
-## Replace auth.ts with
+## Create an authorization service
 
 We will create a simple (very insecure) authentication service containing 4 functions: `login`, `logout`, `isLoggedIn` and `getUserName`. For login it used the `/api/login` endpoint of our nestjs backend. For keeping login details between refreshes in uses `localStorage`.
+
+`auth.ts` in the auth library should now look like this.
 
 ```ts
 class AuthenticationService {
@@ -914,4 +918,4 @@ In order to fix this we have to add the following items to the shared list of th
 }
 ```
 
-After this is added, the flights route should work!.
+After this is added, the flights route should work!
