@@ -14,16 +14,20 @@
   - [Module Federation with Angular](#module-federation-with-angular)
     - [The Shell (aka Host)](#the-shell-aka-host)
     - [Conclusion](#conclusion)
-  - [Extra Dynamic Module Federation with Angular](#extra-dynamic-module-federation-with-angular)
-    - [Module Federation Config](#module-federation-config)
-    - [Routing to Dynamic Micro frontends](#routing-to-dynamic-micro-frontends)
-    - [Improvement for Dynamic Module Federation](#improvement-for-dynamic-module-federation)
-    - [Bonus: Dynamic Routes for Dynamic Microfrontends](#bonus-dynamic-routes-for-dynamic-microfrontends)
+  - [Dynamic Module Federation](#dynamic-module-federation)
+  - [Getting Out of Version-Mismatch-Hell with Module Federation](#getting-out-of-version-mismatch-hell-with-module-federation)
+  - [Pitfalls](#pitfalls)
+  - [Multi-framework and -version micro frontends with Module Federation: The Good, the Bad, the Ugly](#multi-framework-and-version-micro-frontends-with-module-federation-the-good-the-bad-the-ugly)
+    - [The 1st Rule for Multi-framework and -version MFEs](#the-1st-rule-for-multi-framework-and-version-mfes)
+      - [Alternative 1: Evergreen Version with Module Federation](#alternative-1-evergreen-version-with-module-federation)
+      - [Alternative 2: Relaxing Version Requirements + Heavy Testing](#alternative-2-relaxing-version-requirements-heavy-testing)
+    - [The Good](#the-good)
+    - [The Bad](#the-bad)
+    - [The Ugly](#the-ugly)
     - [Conclusion](#conclusion-1)
   - [React](#react)
   - [Typescript](#typescript)
   - [Lit-element](#lit-element)
-  - [Current state](#current-state)
 
 ## What's inside
 
@@ -233,7 +237,7 @@ import('mfe1/component')
 
 > New to Angular? [Read the Angular introduction](./angular-intro.md)
 
-We have shown how to use Module Federation to implement microfrontends. This part brings Angular into play and shows how to create an Angular-based microfrontend shell using the router to lazy load a separately compiled, and deployed microfrontend.
+We have shown how to use Module Federation to implement micro frontends. This part brings Angular into play and shows how to create an Angular-based micro frontend shell using the router to lazy load a separately compiled, and deployed micro frontend.
 
 ### The Shell (aka Host)
 
@@ -253,50 +257,102 @@ However, this approach also puts more responsibility on the developers. For exam
 
 One also has to deal with possible version conflicts. For example, it is likely that components that were compiled with completely different Angular versions will not work together at runtime. Such cases must be avoided with conventions or at least recognized as early as possible with integration tests.
 
-## Extra Dynamic Module Federation with Angular
+## Dynamic Module Federation
 
-Assuming a more dynamic situation where the shell does not know the micro frontends or even their number upfront. Instead, this information is provided at runtime via a lookup service.
+Dynamic Module Federation provides more flexibility as it allows loading micro frontends we don’t have to know at compile time. We don’t even have to know their number upfront. This is possible because of the runtime API provided by webpack. To make using it a bit easier, the `@angular-architects/module-federation` plugin wrap it nicely into some convenience functions.
 
-Plaatje?
+The following blog post explains in detail how this works [Dynamic Module Federation with Angular](https://www.angulararchitects.io/en/aktuelles/dynamic-module-federation-with-angular/)
 
-For all micro frontends the shell gets informed about at runtime it displays a menu item. When clicking it, the micro frontend is loaded and displayed by the shell’s router.
+## Getting Out of Version-Mismatch-Hell with Module Federation
 
-### Module Federation Config
+Webpack Module Federation makes it easy to load separately compiled code like micro frontends. It even allows us to share libraries among them. This prevents that the same library has to be loaded several times.
 
-### Routing to Dynamic Micro frontends
+However, there might be situations where several micro frontends and the shell need different versions of a shared library. Also, these versions might not be compatible with each other.
 
-### Improvement for Dynamic Module Federation
+For dealing with such cases, Module Federation provides several options:
 
-This was quite easy, wasn’t it? However, we can improve this solution a bit. Ideally, we load the remote entry upfront before Angular bootstraps. In this early phase, Module Federation tries to determine the highest compatible versions of all dependencies.
+- Semantic Versioning by Default
+- Fallback Modules for Incompatible Versions
+- Singletons
+- Accepting a Version Range
 
-Let’s assume, the shell provides version `1.0.0` of a dependency (specifying `^1.0.0` in its `package.json`) and the micro frontend uses version `1.1.0` (specifying `^1.1.0` in its `package.json`). In this case, they would go with version `1.1.0`. However, this is only possible if the remote’s entry is loaded upfront.
+Module Federation brings several options for dealing with different versions and version mismatches. Most of the time, you don’t need to do anything, as it uses semantic versioning to decide for the highest compatible version. If a remote needs an incompatible version, it falls back to such one by default.
 
-> versie mismatch uitleggen? hier, later, andere MD file of niet?
+[Getting Out of Version-Mismatch-Hell with Module Federation](https://www.angulararchitects.io/en/aktuelles/getting-out-of-version-mismatch-hell-with-module-federation) explains the options in detail.
 
-To achieve this goal, let’s use the helper function `loadRemoteEntry` in our `main.ts`
+## Pitfalls
 
-```ts
-import { loadRemoteEntry } from '@angular-architects/module-federation';
+While Module Federation is really a straight and thoroughly thought through solution, using micro frontends means in general to make runtime dependencies out of compile time dependencies. As a result, the compiler cannot protect you as well as you are used to. Here are some examples:
 
-Promise.all([
-  loadRemoteEntry({type: 'module', remoteEntry: 'http://localhost:3000/remoteEntry.js'})
-])
-  .catch(err => console.error('Error loading remote entries', err))
-  .then(() => import('./bootstrap'))
-  .catch(err => console.error(err));
-```
+- "No required version specified" and Secondary Entry Points
+- Unobvious Version Mismatches: Issues with Peer Dependencies
+- Issues with Sharing Code and Data
+- NullInjectorError: Service expected in Parent Scope (Root Scope)
+- Multiple Bundles
 
-Here, we need to remember, that the `@angular-architects/module-federation` plugin moves the contents of the original `main.ts` into the `bootstrap.ts` file. Also, it loads the `bootstrap.ts` with a dynamic import in the `main.ts`. This is necessary because the dynamic import gives _Module Federation_ the needed time to negotiate the versions of the shared libraries to use with all the remotes.
+[Manfred Steyer](https://www.angulararchitects.io/en/aktuelles/pitfalls-with-module-federation-and-angular/) explains these errors in detail and how to fix them.
 
-Also, loading the remote entry needs to happen before importing `bootstrap.ts` so that its metadata can be respected during the negotiation.
+Module Federation is really clever when it comes to auto-detecting details and compensating for version mismatches. However, it can only be as good as the meta data it gets. To avoid getting off the rails, you should remember the following:
 
-### Bonus: Dynamic Routes for Dynamic Microfrontends
+- **requiredVersion**: Assign the requiredVersion by hand, esp. when working with secondary entrypoints and when having peer dependency warnings. The plugin @angular-architects/module-federation get’s you covered with its share helper function allowing the option requiredVersion: 'auto' that takes the version number from your project’s package.json.
+- **Share dependencies of shared libraries** too, esp. if they are also used somewhere else. Also think on secondary entry points.
+- Make the **shell provide global services** the loaded micro frontends need, e. g. the `HttpClient` via the `HttpClientModule`.
+Never expose the `AppModule` via Module Federation. Prefer to expose lazy Feature modules.
+- Use `singleton:true` for Angular and other stateful framework respective libraries.
+- Don’t worry about **duplicated bundles** as long as only one of them is loaded at runtime.
 
-Mogelijk idee om zelf te implementeren?
+## Multi-framework and -version micro frontends with Module Federation: The Good, the Bad, the Ugly
+
+Combining Module Federation and Web Components brings several advantages. Nevertheless, in general, combining different frameworks and versions is nothing the individual frameworks have been built for. Hence, there are some pitfalls, here are some workarounds.
+
+### The 1st Rule for Multi-framework and -version MFEs
+
+**Don’t do it** 😉
+
+Seriously, while wrapping applications into web components and loading them with Module Federation is not that difficult, there are several pitfalls along the way. Hence, two alternatives:
+
+#### Alternative 1: Evergreen Version with Module Federation
+
+if all parts of your system use the same major version, using Module Federation for integrating them is straightforward. We don’t need Web Components to bridge the gap between different versions and from our framework’s perspective, everything we do is using lazy loading. Underneath the covers, Module Federation takes care of loading separately compiled code at runtime.
+
+#### Alternative 2: Relaxing Version Requirements + Heavy Testing
+
+Another approach is to relax the requirements for needed versions. For instance, we could tell Module Federation that an application built with Angular 10 also works with Angular 11. For this, Module Federation provides the configuration property `requiredVersion` described earlier
+  
+This might work because, normally, Angular’s core didn’t recently change much between major versions. However, this is not officially supported and hence you need a huge amount of E2E tests to make sure everything works seamlessly together. On the other side, you need E2E tests anyway as micro frontends are runtime dependencies not known upfront at compilation time.
+
+### The Good
+
+Okay, let’s go on with finding out how the combination of Module Federation and Web Components allows building multi framework(version) micro frontends
+
+- Sharing Libraries
+- Exporting Web Components
+- Loading micro frontends dynamically
+- No need for a separate meta framework
+- Standalone Mode
+
+### The Bad
+
+Now, let’s proceed with some of the challenges this architecture comes with.
+
+- Bundle Size
+- Several Routers must Work Together
+
+### The Ugly
+
+As all these frameworks are not designed to work side-by-side with different versions of itself or other frameworks, we also need some "special" workarounds
+
+- Bypassing Routing Issues
+- Reuse Angular Platform
+- Angular Elements and Zone.js
 
 ### Conclusion
 
-Dynamic Module Federation provides more flexibility as it allows loading micro frontends we don’t have to know at compile time. We don’t even have to know their number upfront. This is possible because of the runtime API provided by webpack. To make using it a bit easier, the `@angular-architects/module-federation` plugin wrap it nicely into some convenience functions.
+Using Module Federation together with Web Components leads to a huge amount of advantages: We can easily share libraries, provide and dynamically load Web Components and route to web components using a wrapper. Also, our main framework e.g. Angular also becomes our meta framework so that we don’t need to deal with additional technologies. The loaded Web Components can even make use of lazy loading.
+
+However, this comes with costs: **Bundle Sizes** increase and we need several tricks and workarounds to make everything work seamlessly.
+
+Building micro frontend architectures using Web Components and adding Module Federation to the game makes this by far simpler.
 
 ## React
 
@@ -309,13 +365,3 @@ Dynamic Module Federation provides more flexibility as it allows loading micro f
 ## Lit-element
 
 > New to lit-element? [Read the Lit-element introduction](./lit-intro.md)
-
-## Current state
-
-Angular -> <https://angular.io/guide/roadmap#investigate-micro-frontend-architecture-for-scalable-development-processes>
-
-- angular als shell?
-- angular niet als shell maakt routing en zone lastiger
-React -> react 17: <https://reactjs.org/docs/web-components.html>, react 18 mogelijk web component support, preact heeft wel support
-Vue -> Zie hier nog geen problemen.
-Lit-element -> geen problemen.
