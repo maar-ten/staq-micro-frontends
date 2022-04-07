@@ -22,7 +22,7 @@ Components are the most fundamental building blocks of a react application. In R
 
 Here every colored box that you can see, represents a different component. Each individual component is independent of one another and responsible both for it’s visual appearances and its interactions.
 
-![React Components Layout](./images/components.webp)
+![React Components Layout](./images/components.png)
 
 In layman terms, a component is basically just a file that contains all the html, styling and js logic in one group.
 

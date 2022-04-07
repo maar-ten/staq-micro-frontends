@@ -116,7 +116,7 @@ Since this is not possible for the reasons mentioned, one had to resort to appro
 
 The idea behind it is simple: A so-called _host_ references a _remote_ using a configured name. What this name refers to **is not known at compile time**:
 
-![host remote](./images/host-remote.webp)
+![host remote](./images/host-remote.png)
 
 This reference is only _resolved at runtime by loading a so-called remote entry point_. It is a _minimal script_ that provides the actual external url for such a configured name.
 
