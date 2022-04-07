@@ -6,7 +6,7 @@
   - [Create an authorization service](#create-an-authorization-service)
   - [Create login application](#create-login-application)
   - [Add FormsModule to entry.module.ts import list in the login application](#add-formsmodule-to-entrymodulets-import-list-in-the-login-application)
-  - [Replace entry.component.ts with](#replace-entrycomponentts-with)
+  - [Create a login form component](#create-a-login-form-component)
 - [Add a web component based dashboard](#add-a-web-component-based-dashboard)
   - [Install Lit](#install-lit)
   - [Create dashboard application](#create-dashboard-application)
@@ -197,7 +197,7 @@ If you now start the application with `npm run start:all` and open the shell on 
 
 # Add a web component based dashboard
 
-In the next section we will add a web component based application, using the lit libary to simplify the creation of web components.
+In the next section we will add a web component based application, using the lit library to simplify the creation of web components.
 
 ## Install Lit
 
@@ -324,7 +324,7 @@ module.exports = (config) =>
 
 The `publicPath` attribute is so that applications using the dashboard as a remote know the root url to request resources from. `auto` lets webpack determine this. `optimization` and `experiments` are both required for Module federation to work. The ModuleFederationPlugin is configured similarly to the Angular application ModuleFederationPlugin, but instead of a `remotes` section, it has an `exposes` section.
 If you remember when adding the `login` application, in the shell application routes we used `import('login/Module')`. The `Module` section of that is determined here, if we change the exposes to for example `"./App"`, applications importing it would have to use `import('login/App')`.
-An application can expose as many modules as it wants here, and these can be seperately imported in consuming applications.
+An application can expose as many modules as it wants here, and these can be separately imported in consuming applications.
 
 ## Update de dashboard project index html
 
@@ -358,7 +358,7 @@ We need to add a wrapper component for remote web components for angular.
 
 ## Add a remote web component wrapper to the shell application
 
-We now need a way for the shell application to load remote web components. The are multiple ways you could go about this, but for the purposes of this workshop we will create a reusable angular component that gets as input the function to load the remote application, and the tag name of the web component. Because the webcomponent registers itself we then only have use `document.createElement` to create the web component and append it to a wrapper div element.
+We now need a way for the shell application to load remote web components. The are multiple ways you could go about this, but for the purposes of this workshop we will create a reusable angular component that gets as input the function to load the remote application, and the tag name of the web component. Because the web component registers itself we then only have use `document.createElement` to create the web component and append it to a wrapper div element.
 The way the component receives this information is through data passed in by the route. It will become more clear what we are doing here in the next step when we update the app module of the shell with the dashboard route.
 
 For now, create a file called `web-component-container.component.ts` in the same directory as `app.module.ts` in the shell application with the following content.
@@ -390,11 +390,11 @@ export class WebComponentContainerComponent implements OnInit {
 
 ## Add the dashboard route to the shell application module
 
-Finally, we have to add a route to the shell application which will display the remote dashboard component. Make juse to add the `WebComponentContainerComponent` to the `imports`, and the `declarations` list.
+Finally, we have to add a route to the shell application which will display the remote dashboard component. Make sure to add the `WebComponentContainerComponent` to the `imports`, and the `declarations` list.
 
-Next add the following route to the same array the login route is in. The `path` tells angular it should only match this route to the root url. The `component` indicats which component Angular should render on this route.
+Next add the following route to the same array the login route is in. The `path` tells angular it should only match this route to the root url. The `component` indicate which component Angular should render on this route.
 
-Finally, whatever we add into the `data` property, is accessable in the component through the `ActivatedRoute` snapshot data. As you can see the names match those that we used in the component in the previous step. `loadElement` is a function that returns a dynamic import of the remote application. `elementName` matches the one we registered in the dashboard applications `app.element.ts` file with `customElements.define('mfe-dashboard', MFEDashboardElement);`.
+Finally, whatever we add into the `data` property, is accessible in the component through the `ActivatedRoute` snapshot data. As you can see the names match those that we used in the component in the previous step. `loadElement` is a function that returns a dynamic import of the remote application. `elementName` matches the one we registered in the dashboard applications `app.element.ts` file with `customElements.define('mfe-dashboard', MFEDashboardElement);`.
 
 ```ts
 {
@@ -462,7 +462,7 @@ This will generate a react application called flights in the `apps` directory.
 
 ## Add a flights and flight search component
 
-Next we will add a flights home page and seach page. We will use `react-router-dom` to define the routes and render either `Search` or `Home` component based on that. If you notice in the `App` component, we pass in the rootUrl, the that the remote does not need to know what base url it will be hosted on, while still being able to define it's own routes.
+Next we will add a flights home page and search page. We will use `react-router-dom` to define the routes and render either `Search` or `Home` component based on that. If you notice in the `App` component, we pass in the rootUrl, the that the remote does not need to know what base url it will be hosted on, while still being able to define it's own routes.
 
 You can replace the flights applications app.tsx with the following.
 
@@ -958,7 +958,7 @@ remotes: {
 
 ## Add the remote component to the existing React component
 
-React allows you to lazily load other react compoments using dynamic imports. We can use this define a react component that will render a web component loaded from a remote. For typescript not to complain about not knowing the JSX `<mfe-current-weather></mfe-current-weather>` component, we have to add a global type.
+React allows you to lazily load other react components using dynamic imports. We can use this define a react component that will render a web component loaded from a remote. For typescript not to complain about not knowing the JSX `<mfe-current-weather></mfe-current-weather>` component, we have to add a global type.
 
 `lazy` is a function react make available to allow for lazily loading other react components. It expects a function that returns a promise to a module that exports a react component as default export. Because the web component registers itself we can instantly use it once it's been imported.
 
@@ -967,7 +967,7 @@ Add the following right below your imports in app.tsx, the import of lazy and Su
 ```ts
 import { lazy, Suspense } from "react";
 
-// typescipt vertellen dat de web component mfe-button bestaat
+// stfu typescipt
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
@@ -984,7 +984,7 @@ const CurrentWeather = lazy(() =>
 );
 ```
 
-The last step is to use the `CurrentWeather` react component in our existing `Home` component. Replace the Home function in app.tsx with the following. The diffence is the addition of the Suspense and CurrentWeather components. When using a lazy react component, you are required to wrap it in a `Suspense` component. This allows you to define a fallback that is shown while the remote is being loaded.
+The last step is to use the `CurrentWeather` react component in our existing `Home` component. Replace the Home function in app.tsx with the following. The difference is the addition of the Suspense and CurrentWeather components. When using a lazy react component, you are required to wrap it in a `Suspense` component. This allows you to define a fallback that is shown while the remote is being loaded.
 
 ```tsx
 export function Home() {
@@ -1010,7 +1010,7 @@ export function Home() {
 }
 ```
 
-When you start the application again you should see the current wheather component inside the flights component when you got to `http://localhost:4200/flights`.
+When you start the application again you should see the current weather component inside the flights component when you got to `http://localhost:4200/flights`.
 
 ## Next steps
 
