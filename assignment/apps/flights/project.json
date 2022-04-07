@@ -41,7 +41,7 @@
       "executor": "@nrwl/web:dev-server",
       "options": {
         "buildTarget": "flights:build",
-        "hmr": true,
+        "hmr": false,
         "proxyConfig": "apps/flights/proxy.conf.json",
         "port": 4203
       },

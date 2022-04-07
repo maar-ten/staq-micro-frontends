@@ -10,6 +10,7 @@ declare global {
   namespace JSX {
     interface IntrinsicElements {
       'mfe-button': any;
+      'mfe-current-weather': any;
     }
   }
 }
@@ -20,12 +21,22 @@ const WebComponentButton = lazy(() =>
   }))
 );
 
+const CurrentWeather = lazy(() =>
+  import('dashboard/CurrentWeather').then(() => ({
+    default: () => <mfe-current-weather></mfe-current-weather>,
+  }))
+);
+
 export function Home() {
   const [username] = useState(authService.getUserName());
 
   return (
     <>
       <h1>Welcome, {username}!</h1>
+
+      <Suspense fallback={() => <div>Loading weather...</div>}>
+        <CurrentWeather />
+      </Suspense>
 
       <p>
         <Link to="/search">Search flights.</Link>
