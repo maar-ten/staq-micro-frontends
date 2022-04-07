@@ -12,7 +12,7 @@
     - [Implementation of a host](#implementation-of-a-host)
     - [Implementation of the Remote](#implementation-of-the-remote)
   - [Module Federation with Angular](#module-federation-with-angular)
-    - [The Shell (aka Host)](#the-shell-aka-host)
+    - [Your mission, if you choose to accept it](#your-mission-if-you-choose-to-accept-it)
     - [Conclusion](#conclusion)
   - [Dynamic Module Federation](#dynamic-module-federation)
   - [Getting Out of Version-Mismatch-Hell with Module Federation](#getting-out-of-version-mismatch-hell-with-module-federation)
@@ -25,9 +25,6 @@
     - [The Bad](#the-bad)
     - [The Ugly](#the-ugly)
     - [Conclusion](#conclusion-1)
-  - [React](#react)
-  - [Typescript](#typescript)
-  - [Lit-element](#lit-element)
 
 ## What's inside
 
@@ -239,13 +236,18 @@ import('mfe1/component')
 
 We have shown how to use Module Federation to implement micro frontends. This part brings Angular into play and shows how to create an Angular-based micro frontend shell using the router to lazy load a separately compiled, and deployed micro frontend.
 
-### The Shell (aka Host)
+### Your mission, if you choose to accept it
 
-> New to Nx? [Read the Nx introduction](./nx-intro.md)
+If you want to know more about the tools used in the hands-on:
 
-We are a [Micro Frontend with runtime integration](./micro-frontends.md#types-of-micro-frontends-build-loading-approaches)
+- [React introduction](./react-intro.md)
+- [Typescript introduction](./typescript-intro.md)
+- [Lit-element introduction](./lit-intro.md)
+- [Nx introduction](./nx-intro.md)
 
-Opdracht hier
+You are a creating a [micro frontend with runtime integration](./micro-frontends.md#types-of-micro-frontends-build-loading-approaches).
+
+**[Open to accept your mission](./HANDS-ON.MD)**
 
 ### Conclusion
 
@@ -353,15 +355,3 @@ Using Module Federation together with Web Components leads to a huge amount of a
 However, this comes with costs: **Bundle Sizes** increase and we need several tricks and workarounds to make everything work seamlessly.
 
 Building micro frontend architectures using Web Components and adding Module Federation to the game makes this by far simpler.
-
-## React
-
-> New to react? [Read the React introduction](./react-intro.md)
-
-## Typescript
-
-> New to Typescript? [Read the Typescript introduction](./typescript-intro.md)
-
-## Lit-element
-
-> New to lit-element? [Read the Lit-element introduction](./lit-intro.md)
