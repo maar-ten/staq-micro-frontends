@@ -17,7 +17,9 @@ declare global {
 
 const WebComponentButton = lazy(() =>
   import('dashboard/Button').then(() => ({
-    default: () => <mfe-button text="Click me!"></mfe-button>,
+    default: () => (
+      <mfe-button text="Look Ma! I'm web component button"></mfe-button>
+    ),
   }))
 );
 
@@ -72,9 +74,6 @@ export function Search() {
         </div>
       </div>
       <div className="mt-3">
-        <Suspense fallback={() => <div>Loading...</div>}>
-          <WebComponentButton />
-        </Suspense>
         <button
           onClick={() => getFlights()}
           type="button"
@@ -82,6 +81,12 @@ export function Search() {
         >
           Search
         </button>
+      </div>
+
+      <div className="mt-3">
+        <Suspense fallback={() => <div>Loading...</div>}>
+          <WebComponentButton />
+        </Suspense>
       </div>
 
       {state.length > 0 && (
@@ -97,7 +102,7 @@ export function Search() {
           </thead>
           <tbody>
             {state.map((s, i) => (
-              <tr key={s.date}>
+              <tr key={s.date + s.departure + s.arrival}>
                 <th scope="row">{i}</th>
                 <td>{dateFormat(s.date)}</td>
                 <td>{s.departure}</td>
