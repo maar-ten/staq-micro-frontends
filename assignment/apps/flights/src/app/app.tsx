@@ -33,17 +33,21 @@ export function Home() {
   const [username] = useState(authService.getUserName());
 
   return (
-    <>
-      <h1>Welcome, {username}!</h1>
+    <section className="container">
+      <header>
+        <h1>Welcome, {username}!</h1>
+      </header>
 
       <Suspense fallback={() => <div>Loading weather...</div>}>
-        <CurrentWeather />
+        <div className="mt-3 mb-3">
+          <CurrentWeather />
+        </div>
       </Suspense>
 
-      <p>
+      <footer>
         <Link to="/search">Search flights.</Link>
-      </p>
-    </>
+      </footer>
+    </section>
   );
 }
 
@@ -63,8 +67,10 @@ export function Search() {
   };
 
   return (
-    <div className="container">
-      <h1>Flights</h1>
+    <section className="container">
+      <header>
+        <h1>Flights</h1>
+      </header>
       <div className="row g-2 align-items-center">
         <div className="col-auto">
           <input className="form-control" type="text" placeholder="From" />
@@ -113,7 +119,7 @@ export function Search() {
           </tbody>
         </table>
       )}
-    </div>
+    </section>
   );
 }
 
