@@ -1,10 +1,6 @@
 ## Generate nx mono repo
 
-`npx create-nx-workspace --preset=empty --name=mfe --nx-cloud false`
-
-## Install nx cli
-
-`npm install -g nx`
+`npx create-nx-workspace@13.9.5 --preset=empty --name=mfe --nx-cloud false`
 
 ## Go to project directory
 
@@ -12,7 +8,7 @@
 
 ## Install nx angular
 
-`npm install --save-dev @nrwl/angular`
+`npm install -D @nrwl/angular@13.9.5`
 
 ## Add following to package.json
 
@@ -27,7 +23,7 @@
 
 ## Create shell application
 
-`nx g @nrwl/angular:app shell --mfe --mfeType=host --routing=true --skipTests --style=css --e2eTestRunner=none`
+`npx nx g @nrwl/angular:app shell --mfe --mfeType=host --routing=true --skipTests --style=css --e2eTestRunner=none`
 
 ## Replace app.component.html with
 
@@ -38,29 +34,6 @@
 </ul>
 
 <router-outlet></router-outlet>
-```
-
-## Delete nx-welcome.component.ts
-
-## Replace app.module.ts with
-
-```ts
-import { NgModule } from "@angular/core";
-import { BrowserModule } from "@angular/platform-browser";
-
-import { AppComponent } from "./app.component";
-import { RouterModule } from "@angular/router";
-
-@NgModule({
-  declarations: [AppComponent],
-  imports: [
-    BrowserModule,
-    RouterModule.forRoot([], { initialNavigation: "enabledBlocking" }),
-  ],
-  providers: [],
-  bootstrap: [AppComponent],
-})
-export class AppModule {}
 ```
 
 ## Add this to styles.css
@@ -76,11 +49,11 @@ body {
 
 ## Install nx nest
 
-`npm install -D @nrwl/nest`
+`npm install -D @nrwl/nest@13.9.5`
 
 ## Create nest application
 
-`nx g @nrwl/nest:app backend --frontendProject shell`
+`npx nx g @nrwl/nest:app backend --frontendProject shell`
 
 ## Replace app.controller.ts with following
 
@@ -130,11 +103,11 @@ We're going to add an authentication library that can be shared between our diff
 
 ## Install nx web
 
-`npm install -D @nrwl/web`
+`npm install -D @nrwl/web@13.9.5`
 
 ## Generate auth library
 
-`nx g @nrwl/web:lib auth --unitTestRunner none`
+`npx nx g @nrwl/web:lib auth --unitTestRunner=none`
 
 ## Replace auth.ts with
 
@@ -172,7 +145,7 @@ export const authService = new AuthenticationService();
 
 ## Create login application
 
-`nx g @nrwl/angular:app login --mfe --mfeType=remote --port=4201 --host=shell --routing=true --skipTests --style=css --e2eTestRunner=none`
+`npx nx g @nrwl/angular:app login --mfe --mfeType=remote --port=4201 --host=shell --routing=true --skipTests --style=css --e2eTestRunner=none`
 
 Note: We provided remote as the --mfeType. This tells the generator to create a Webpack configuration file that is ready to be consumed by a Host application.
 
@@ -242,11 +215,11 @@ If you open the shell on http://localhost:4200/login you should see the login co
 
 ## Install Lit
 
-`npm i lit`
+`npm i lit@2.2.1`
 
 ## Create dashboard application
 
-`nx g @nrwl/web:application dashboard --e2eTestRunner=none --unitTestRunner=none --style css`
+`npx nx g @nrwl/web:application dashboard --e2eTestRunner=none --unitTestRunner=none --style css`
 
 ## Replace app.element.ts with
 
@@ -295,11 +268,11 @@ customElements.define("mfe-dashboard", MFEDashboardElement);
 
  "options": {
     "buildTarget": "dashboard:build",
-+   "port": 4202,
++   "port": 4202
  },
 ```
 
-## Voeg aan de dashboard project root webpack.config.js toe
+## Voeg aan de dashboard project root een webpack.config.js toe
 
 ```js
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
@@ -364,14 +337,14 @@ module.exports = require("./webpack.config");
 +   dashboard: 'http://localhost:4202/remoteEntry.js'
 ```
 
-We need to add a wrapper component for remote web components for angular.
-
 ## Update decl.d.ts in shell project
 
 ```ts
     declare module "login/Module";
 +   declare module "dashboard/Module";
 ```
+
+We need to add a wrapper component for remote web components for angular.
 
 ## Add web-component-container.component.ts to the shell application
 
@@ -437,4 +410,325 @@ import { WebComponentContainerComponent } from "./web-component-container.compon
   bootstrap: [AppComponent],
 })
 export class AppModule {}
+```
+
+# Add react flights application
+
+## Install nx react library
+
+`npm install -D @nrwl/react@13.9.5`
+
+## Generate react application
+
+`npx nx g @nrwl/react:app flights --e2eTestRunner=none --routing=true --style=css --unitTestRunner=none`
+
+## Update react project.json
+
+```json
+    "styles": ["apps/flights/src/styles.css"],
+    "scripts": [],
+ +  "webpackConfig": "apps/flights/webpack.config.js"
+
+ ///
+
+ "options": {
+    "buildTarget": "flights:build",
++   "port": 4203,
+ },
+```
+
+## Replace app.tsx with
+
+```ts
+import { authService } from "@mfe/auth";
+import { useState } from "react";
+import { BrowserRouter, Link, Route } from "react-router-dom";
+
+export function Home() {
+  const [username] = useState(authService.getUserName());
+
+  return (
+    <>
+      <h1>Welcome, {username}!</h1>
+
+      <p>
+        <Link to="/search">Search flights.</Link>
+      </p>
+    </>
+  );
+}
+
+export function Search() {
+  const [state, setState] = useState<
+    {
+      date: string;
+      departure: string;
+      arrival: string;
+      price: number;
+    }[]
+  >([]);
+  const getFlights = () => {
+    fetch("api/flights")
+      .then((res) => res.json())
+      .then((flights) => setState(flights));
+  };
+
+  return (
+    <div className="container">
+      <h1>Flights</h1>
+      <div className="row g-2 align-items-center">
+        <div className="col-auto">
+          <input className="form-control" type="text" placeholder="From" />
+        </div>
+        <div className="col-auto">
+          <input type="text" className="form-control" placeholder="To" />
+        </div>
+      </div>
+      <div className="mt-3">
+        <button
+          onClick={() => getFlights()}
+          type="button"
+          className="btn btn-primary"
+        >
+          Search
+        </button>
+      </div>
+
+      {state.length > 0 && (
+        <table className="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Date</th>
+              <th scope="col">Departure</th>
+              <th scope="col">Arrival</th>
+              <th scope="col">Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {state.map((s, i) => (
+              <tr key={s.date}>
+                <th scope="row">{i}</th>
+                <td>{dateFormat(s.date)}</td>
+                <td>{s.departure}</td>
+                <td>{s.arrival}</td>
+                <td>{numberFormat(s.price)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+}
+
+const numberFormat = (value: number) =>
+  new Intl.NumberFormat("nl-NL", {
+    style: "currency",
+    currency: "EUR",
+  }).format(value);
+
+const dateFormat = (value: string) =>
+  new Intl.DateTimeFormat("nl-NL").format(new Date(value));
+
+export function App({ rootUrl = "" }) {
+  return (
+    <BrowserRouter basename={rootUrl}>
+      <Route path="/" exact render={() => <Home />} />
+      <Route path="/search" exact render={() => <Search />} />
+    </BrowserRouter>
+  );
+}
+
+export default App;
+```
+
+## Voeg webpack.config.js toe aan react root
+
+```js
+const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
+const mf = require("@angular-architects/module-federation/webpack");
+const reactConfig = require("@nrwl/react/plugins/webpack");
+const { merge } = require("webpack-merge");
+
+module.exports = (config) => {
+  config = reactConfig(config);
+  return merge(config, {
+    output: {
+      uniqueName: "flights",
+      publicPath: "auto",
+    },
+    optimization: {
+      runtimeChunk: false,
+    },
+    experiments: {
+      outputModule: true,
+    },
+    plugins: [
+      new ModuleFederationPlugin({
+        name: "flights",
+        filename: "remoteEntry.js",
+        exposes: {
+          "./Module": "apps/flights/src/app/app.tsx",
+        },
+        library: {
+          type: "module",
+        },
+        shared: mf.share({
+          react: {
+            singleton: true,
+            strictVersion: true,
+            requiredVersion: "auto",
+            includeSecondaries: true,
+          },
+          "react-dom": {
+            singleton: true,
+            strictVersion: true,
+            requiredVersion: "auto",
+            includeSecondaries: true,
+          },
+          "react-router-dom": {
+            singleton: true,
+            strictVersion: true,
+            requiredVersion: "auto",
+            includeSecondaries: true,
+          },
+        }),
+      }),
+    ],
+  });
+};
+```
+
+## Voeg een webpack.prod.config.js toe aan react application root
+
+```js
+module.exports = require("./webpack.config");
+```
+
+## Voeg aan de shell applicatie een remote toe aan de webpack.config.js
+
+```js
+    login: 'http://localhost:4201/remoteEntry.js',
+    dashboard: 'http://localhost:4202/remoteEntry.js',
++   flights: 'http://localhost:4203/remoteEntry.js'
+```
+
+## Update decl.d.ts in shell project
+
+```ts
+    declare module "login/Module";
+    declare module "dashboard/Module";
++   declare module "flights/Module";
+```
+
+## Add react-component-container.component.ts
+
+```ts
+import { Component, ElementRef, OnInit, ViewChild } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+
+@Component({
+  selector: "mfe-react-component-container",
+  template: "<div #container></div>",
+})
+export class ReactContainerComponent implements OnInit {
+  @ViewChild("container", { static: true })
+  container!: ElementRef;
+
+  constructor(private readonly route: ActivatedRoute) {}
+
+  async ngOnInit() {
+    const { loadElement, rootUrl } = this.route.snapshot.data;
+    const element = await loadElement();
+
+    const reactELement = React.createElement(element.default, { rootUrl });
+    ReactDOM.render(reactELement, this.container.nativeElement);
+  }
+}
+```
+
+## Replace app.module.ts with the following
+
+```ts
+import { NgModule } from "@angular/core";
+import { BrowserModule } from "@angular/platform-browser";
+
+import { AppComponent } from "./app.component";
+import { RouterModule } from "@angular/router";
+import { WebComponentContainerComponent } from "./web-component-container.component";
+import { ReactContainerComponent } from "./react-component-container.component";
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    WebComponentContainerComponent,
+    ReactContainerComponent,
+  ],
+  imports: [
+    BrowserModule,
+    RouterModule.forRoot(
+      [
+        {
+          path: "login",
+          loadChildren: () =>
+            import("login/Module").then((m) => m.RemoteEntryModule),
+        },
+        {
+          path: "flights",
+          children: [
+            {
+              path: "**",
+              component: ReactContainerComponent,
+              data: {
+                loadElement: () => import("flights/Module"),
+                rootUrl: "/flights",
+              },
+            },
+          ],
+        },
+        {
+          path: "**",
+          component: WebComponentContainerComponent,
+          data: {
+            loadElement: () => import("dashboard/Module"),
+            elementName: "mfe-dashboard",
+          },
+        },
+      ],
+      { initialNavigation: "enabledBlocking" }
+    ),
+  ],
+  providers: [],
+  bootstrap: [AppComponent],
+})
+export class AppModule {}
+```
+
+## Voeg het volgende toe aan de share lijst van de shell webpack.config.js
+
+```js
+{
+//
+  react: {
+    singleton: true,
+    strictVersion: true,
+    requiredVersion: 'auto',
+    includeSecondaries: true,
+  },
+  'react-dom': {
+    singleton: true,
+    strictVersion: true,
+    requiredVersion: 'auto',
+    includeSecondaries: true,
+  },
+  'react-router-dom': {
+    singleton: true,
+    strictVersion: true,
+    requiredVersion: 'auto',
+    includeSecondaries: true,
+  },
+}
 ```
