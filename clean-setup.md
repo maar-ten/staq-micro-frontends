@@ -102,6 +102,10 @@ body {
 />
 ```
 
+## Add angular logo
+
+`cp ../images/angular.png ./apps/shell/src/assets/`
+
 ## Install nx nest
 
 `npm install -D @nrwl/nest@13.9.5`

@@ -46,16 +46,16 @@ Let's get started!
 
 On the summercamp network there is a nexus server with the node packages already cached. To make use of the cache rename the following files:
 
-- `./assignment/.npmrc.summercamp` to `./assignment/.npmrc`
-  - shell: `mv ./assignment/.npmrc.summercamp ./assignment/.npmrc`
-- `./assignment/package-lock.json.summercamp` to `./assignment/package-lock.json`
-  - shell: `rm -f ./assignment/package-lock.json && mv ./assignment/package-lock.json.summercamp ./assignment/package-lock.json`
+- `./mfe/.npmrc.summercamp` to `./mfe/.npmrc`
+  - shell: `mv ./mfe/.npmrc.summercamp ./mfe/.npmrc`
+- `./mfe/package-lock.json.summercamp` to `./mfe/package-lock.json`
+  - shell: `rm -f ./mfe/package-lock.json && mv ./mfe/package-lock.json.summercamp ./mfe/package-lock.json`
 
 ## Get the code
 
 ```sh
 git clone https://staquser:St4q2022!@git.quintor.nl/staq/staq-2022-micro-frontends.git
-cd staq-2022-micro-frontends/assignment
+cd staq-2022-micro-frontends/mfe
 npm install
 npm run start:all
 ```
