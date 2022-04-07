@@ -919,3 +919,212 @@ In order to fix this we have to add the following items to the shared list of th
 ```
 
 After this is added, the flights route should work!
+
+# Use remote web components in the react application
+
+Applications can serve as both host and remotes, to demonstrate this we will expose another component from the dashboard application, and use this in the exposed react component.
+
+## Expose another web component from the dashboard application
+
+First add a `current-weather.element.ts` to the same directory as `app.element.ts`.
+
+```ts
+import { html, css, LitElement } from "lit";
+
+const openWeatherMapApiKey = "8ebf4f448fb0db23d24e285b5683d1bb";
+
+function getPosition(options?: PositionOptions): Promise<GeolocationPosition> {
+  return new Promise((resolve, reject) =>
+    navigator.geolocation.getCurrentPosition(resolve, reject, options)
+  );
+}
+
+async function fetchWeatherData(latitude: number, longitude: number) {
+  // https://openweathermap.org/current
+  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${openWeatherMapApiKey}&lang=nl&units=metric `;
+
+  const result: any = await fetch(url, {
+    method: "GET",
+  }).then((res) => (res.ok ? res.json() : {}));
+  return {
+    temperature: result?.main.temp,
+    timestamp: (result?.dt ?? 0) * 1000,
+    iconAlt: result?.weather[0].description,
+    iconSrc: result?.weather[0].icon,
+  };
+}
+
+async function currentWeather() {
+  const position = await getPosition();
+  const { longitude: long, latitude: lat } = position.coords;
+  return await fetchWeatherData(lat, long);
+}
+
+const dateFormat = (value: Date) =>
+  new Intl.DateTimeFormat("nl-NL").format(value);
+
+const timeFormat = (value: Date) =>
+  new Intl.DateTimeFormat("nl-NL", {
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    timeZoneName: "short",
+  }).format(value);
+
+export class MFECurrentWeather extends LitElement {
+  static get styles() {
+    return css`
+      :host {
+        display: block;
+        margin: initial;
+      }
+    `;
+  }
+
+  static get properties() {
+    return {
+      currentweather: { type: Object },
+    };
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    currentWeather().then((weather) => (this.currentweather = weather));
+  }
+
+  currentweather: {
+    iconAlt: string;
+    iconSrc: string;
+    temperature: number;
+    timestamp: number;
+  };
+
+  render() {
+    const timestamp = new Date(this.currentweather?.timestamp ?? Date.now());
+    const date = dateFormat(timestamp);
+    const time = timeFormat(timestamp);
+
+    return html`
+      <span id="temperature"
+        >Current temperature: ${this.currentweather?.temperature}</span
+      >
+      °<span>C</span>
+      <div>${this.currentweather?.iconAlt}</div>
+      <div>Date of recording: ${date}</div>
+      <div>Time of recording: ${time}</div>
+    `;
+  }
+}
+
+if (!customElements.get("mfe-current-weather")) {
+  customElements.define("mfe-current-weather", MFECurrentWeather);
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "mfe-current-weather": MFECurrentWeather;
+  }
+}
+
+export default MFECurrentWeather;
+```
+
+## Expose this new component using module federation
+
+Add the new component to the exposes list of the dashboard webpack configuration
+
+```js
+exposes: {
+  './Module': 'apps/dashboard/src/app/app.element.ts',
++ './CurrentWeather': 'apps/dashboard/src/app/current-weather.element.ts',
+},
+```
+
+## Let typescript know about the remote module
+
+In the `apps/flights/src` directory add a `decl.d.ts` file with the following content.
+
+```ts
+declare module "dashboard/CurrentWeather";
+```
+
+## Add dashboard as a remote to the flights application
+
+The flights application currently doesn't know about the dashboard application. In order to enable this we must add it to the remotes section of the module federation plugin in the webpack configuration.
+
+```js
+//
+exposes: {
+  './Module': 'apps/flights/src/app/app.tsx',
+},
+remotes: {
+  dashboard: 'http://localhost:4202/remoteEntry.js',
+},
+```
+
+## Add the remote component to the existing React component
+
+React allows you to lazily load other react compoments using dynamic imports. We can use this define a react component that will render a web component loaded from a remote. For typescript not to complain about not knowing the JSX `<mfe-current-weather></mfe-current-weather>` component, we have to add a global type.
+
+`lazy` is a function react make available to allow for lazily loading other react components. It expects a function that returns a promise to a module that exports a react component as default export. Because the web component registers itself we can instantly use it once it's been imported.
+
+Add the following right below your imports in app.tsx, the import of lazy and Suspense have to be added to the existing imports from 'react'.
+
+```ts
+import { lazy, Suspense } from "react";
+
+// typescipt vertellen dat de web component mfe-button bestaat
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace JSX {
+    interface IntrinsicElements {
+      "mfe-current-weather": any;
+    }
+  }
+}
+
+const CurrentWeather = lazy(() =>
+  import("dashboard/CurrentWeather").then(() => ({
+    default: () => <mfe-current-weather></mfe-current-weather>,
+  }))
+);
+```
+
+The last step is to use the `CurrentWeather` react component in our existing `Home` component. Replace the Home function in app.tsx with the following. The diffence is the addition of the Suspense and CurrentWeather components. When using a lazy react component, you are required to wrap it in a `Suspense` component. This allows you to define a fallback that is shown while the remote is being loaded.
+
+```tsx
+export function Home() {
+  const [username] = useState(authService.getUserName());
+
+  return (
+    <section className="container">
+      <header>
+        <h1>Welcome, {username}!</h1>
+      </header>
+
+      <Suspense fallback={() => <div>Loading weather...</div>}>
+        <div className="mt-3 mb-3">
+          <CurrentWeather />
+        </div>
+      </Suspense>
+
+      <footer>
+        <Link to="/search">Search flights.</Link>
+      </footer>
+    </section>
+  );
+}
+```
+
+When you start the application again you should see the current wheather component inside the flights component when you got to `http://localhost:4200/flights`.
+
+# Next steps
+
+Congratulations if you made it this far! We hope you learned a lot. Here are some optional assignments you could try out.
+
+- Add an authorization guard to the flights route that navigates you to the login page if you're not logged in. See the documentation for [CanActivate](https://angular.io/api/router/CanActivate) for more information.
+
+- Split the backend out into a flights backend and login backend to similute a vertical stack split of functionality.
+
+- Add dynamic routes. You won't always know the remote applications at build time, you might load your routes via an api. Warning, this is a very advanced use-case. Further reading can be found [here](https://nx.dev/micro-frontends/dynamic-module-federation-with-angular).
