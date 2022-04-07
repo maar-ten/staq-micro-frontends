@@ -65,13 +65,13 @@ Open <http://127.0.0.1:4200> in a browser. You should see a black menu bar.
 
 For this workshop, we’ll be building a simple app that the user can login and search for flight information. The data will be supplied by NextJS HTTP API's we already supplied. The login page is an Angular Application. The flights page is a React Application. The Dashboard is a lit-element component.
 
-![Homepage](./images/dashbord.png)
-_Angular Shell met lit-element dashbord_
+![Homepage](./images/shell.png)
+_Angular Shell met Angular header en lit-element weather dashboard_
 
 ![Login](./images/login.png)
 _Angular app login_
 
-![Flights](./images/flights.png)
+![Flights](./images/flights-result.png)
 _React app flights_
 
 ## Webpack Module Federation
@@ -116,7 +116,7 @@ Since this is not possible for the reasons mentioned, one had to resort to appro
 
 The idea behind it is simple: A so-called _host_ references a _remote_ using a configured name. What this name refers to **is not known at compile time**:
 
-![host remote](./images/host-remote.webp)
+![host remote](./images/host-remote.png)
 
 This reference is only _resolved at runtime by loading a so-called remote entry point_. It is a _minimal script_ that provides the actual external url for such a configured name.
 
