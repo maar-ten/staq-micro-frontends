@@ -1,7 +1,9 @@
 {
   "version": 2,
   "projects": {
+    "auth": "libs/auth",
     "backend": "apps/backend",
+    "login": "apps/login",
     "shell": "apps/shell"
   }
 }

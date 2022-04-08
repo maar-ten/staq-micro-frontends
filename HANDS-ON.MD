@@ -129,7 +129,7 @@ imports: [
 
 Now we will create a login form component that will allow the users to authenticate. We will use the `authService` we created previously for this. After we successfully login, we navigate back to the application root url.
 
-You can use the following for the existing `app.component.ts`.
+You can use the following for the existing `entry.component.ts`.
 
 ```ts
 import { Component } from "@angular/core";

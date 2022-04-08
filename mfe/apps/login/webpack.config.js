@@ -28,7 +28,7 @@ sharedMappings.register(
 
 module.exports = {
   output: {
-    uniqueName: 'shell',
+    uniqueName: 'login',
     publicPath: 'auto',
   },
   optimization: {
@@ -44,8 +44,10 @@ module.exports = {
   },
   plugins: [
     new ModuleFederationPlugin({
-      remotes: {
-        login: 'https://4201-maarten-staqmicrofronte-rzv2ysithqt.ws-eu38.gitpod.io/remoteEntry.js',
+      name: 'login',
+      filename: 'remoteEntry.js',
+      exposes: {
+        './Module': 'apps/login/src/app/remote-entry/entry.module.ts',
       },
       shared: share({
         '@angular/core': {

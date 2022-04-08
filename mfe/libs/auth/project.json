@@ -1,0 +1,15 @@
+{
+  "root": "libs/auth",
+  "sourceRoot": "libs/auth/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/auth/**/*.ts"]
+      }
+    }
+  },
+  "tags": []
+}
