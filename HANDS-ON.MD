@@ -1,4 +1,4 @@
-# Assignment introduction
+# Your mission details
 
 - [Assignment introduction](#assignment-introduction)
   - [Install nx web](#install-nx-web)
@@ -41,7 +41,7 @@
 
 When you open the app with `npm run start:all` you see a top menu bar, but there is nothing assigned to the application routs.
 
-**Note that if you make changes to webpack configurations or project configurations you will have to shut down and start the application again to have the changes take effect.
+**Note that if you make changes to webpack configurations or project configurations you will have to shut down and start the application again to have the changes take effect.**
 
 First of all we're going to add an authentication library that can be shared between our different applications as a direct dependency. For this we will use an nx web library.
 
@@ -965,8 +965,6 @@ React allows you to lazily load other react components using dynamic imports. We
 Add the following right below your imports in app.tsx, the import of lazy and Suspense have to be added to the existing imports from 'react'.
 
 ```ts
-import { lazy, Suspense } from "react";
-
 // stfu typescipt
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -1010,7 +1008,7 @@ export function Home() {
 }
 ```
 
-When you start the application again you should see the current weather component inside the flights component when you got to `http://localhost:4200/flights`.
+When you start the application again you should see the current weather component inside the flights component when you got to `http://localhost:4200/flights`
 
 ## Next steps
 
